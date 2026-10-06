@@ -1,0 +1,11 @@
+﻿BUILD FAILED (flags: -ml -1 -O2 -r-)
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+dacwrite.c:
+Error dacwrite.c 26: Invalid combination of opcode and operands in function dac_write
+*** 1 errors in Compile ***
+
+
+	Available memory 4199108
+
+BUILD_FAILED
+

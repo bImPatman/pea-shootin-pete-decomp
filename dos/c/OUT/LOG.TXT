@@ -1,0 +1,10 @@
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+samemod.c:
+
+	Available memory 4190028
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+samemod.c:
+
+	Available memory 4191804
+Turbo Link  Version 5.1 Copyright (c) 1992 Borland International
+BUILD_OK

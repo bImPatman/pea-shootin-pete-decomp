@@ -1,0 +1,86 @@
+﻿  @extra: missing source C:\Users\patri\pea-shoot\src\stubs;
+  @extra: missing source C:\Users\patri\pea-shoot\src\those
+BUILD FAILED (flags: -ml -1 -O2 -r-)
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+main.c:
+Warning main.c 118: Parameter 'argc' is never used in function main
+Warning main.c 118: Parameter 'envp' is never used in function main
+Warning main.c 125: Code has no effect in function m_24e7
+Warning main.c 127: Code has no effect in function m_154f
+
+
+	Available memory 4156312
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+main.c:
+Warning main.c 118: Parameter 'argc' is never used in function main
+Warning main.c 118: Parameter 'envp' is never used in function main
+Warning main.c 125: Code has no effect in function m_24e7
+Warning main.c 127: Code has no effect in function m_154f
+
+
+	Available memory 4157320
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xb11a.c:
+
+
+	Available memory 4189524
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xb11a.c:
+
+
+	Available memory 4190800
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xf44d.c:
+
+
+	Available memory 4189524
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xf44d.c:
+
+
+	Available memory 4190800
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xf44b.c:
+
+
+	Available memory 4189272
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xf44b.c:
+
+
+	Available memory 4190548
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xf44c.c:
+
+
+	Available memory 4189524
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xf44c.c:
+
+
+	Available memory 4190800
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xe256.c:
+
+
+	Available memory 4189524
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xe256.c:
+
+
+	Available memory 4190800
+
+
+LINK RUNAWAY: Turbo Link emitted MAIN.MAP (8110.1 MB) -- almost always a duplicate symbol such as a second main().
+

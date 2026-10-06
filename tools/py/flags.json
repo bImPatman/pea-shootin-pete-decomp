@@ -1,0 +1,25 @@
+{
+ "model": "-ml",
+ "cpu": "-1",
+ "optimize": "-O2",
+ "codegen": "-r-",
+ "stackframe": "",
+ "alignment": "",
+ "pascal": "",
+ "stackchk": "",
+ "merge": "",
+ "reload": "",
+ "debug": "",
+ "extra": "",
+
+ "_comment": "Pinned by tools/py/check.py; see notes/compiler.md for the evidence.",
+ "_evidence": {
+  "model": "-ml: runtime fingerprint 76.6% vs 52.8% huge, 27.3% medium, 25.8% small",
+  "cpu": "-1: 80186-only encodings present (add r/m,imm8 / leave / push imm16); no 286/386-only forms",
+  "optimize": "-O2: the only 3.1 setting that allocates frames with sub sp,N / leave; 100 target functions use it and 0 use enter. Caveat: no single 3.1 setting fits - see the 'enter versus sub sp' section; src/farstreq.c overrides with @flags -O1",
+  "codegen": "-r-: -r keeps probe locals in registers and removes the frame entirely, which the target does not do",
+  "stackchk": "empty: -N is ruled out, it grows FUN_1000_0f21 from 21 to 32 bytes",
+  "stackframe": "empty: -k untested against a discriminating function",
+  "reload": "empty: -Z untested against a discriminating function"
+ }
+}

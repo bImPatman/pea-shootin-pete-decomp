@@ -1,0 +1,358 @@
+# PETE.EXE decompilation
+
+Reconstructing `PETE.EXE` (DOS, Borland C++ 3.1, Mystic "Worx Toolkit") as C
+source that **recompiles to the original bytes**, with every claim checked by
+machine rather than by eye.
+
+The project is not "read the disassembly and write plausible C". It is a
+loop: write C, compile with the original toolchain, disassemble the result,
+compare against the target, and keep only what verifies.
+
+**Current: 20 of 454 target functions reproduced byte-for-byte.** See
+[Progress](#progress).
+
+## How it works
+
+```
+target.txt  (Ghidra) ──┐
+                        ├─→ diffasm ─→ shape / exact verdict ─→ out/status.json
+src/*.c ─→ bcc 3.1 ─→ exe ─┘
+```
+
+Comparison runs in two tiers:
+
+* **shape** — mnemonics, operand *kinds* and instruction *sizes* match; every
+  address-valued field is a wildcard.
+* **exact** — bytes identical except inside address-valued fields, with the
+  address correspondence printed so it can be eyeballed.
+
+Addresses necessarily differ (the rebuild is a different program laid out in a
+different order), so `exact` masks them but reports them rather than hiding
+them.
+
+Both tiers normalise immediates against a single shared image size. An earlier
+version used each side's own size, which classified the same bytes differently:
+`add ax,0xfff9` is below the 113 KB target image and so became a masked `addr`,
+but above a small rebuild's image and so became a literal `imm`. Byte-identical
+code failed `shape` for that reason alone. `diffasm.report` now uses
+`max(tsize, msize)` for both sides.
+
+### The Ghidra export has holes
+
+`out/target.txt` is not a complete disassembly. Some basic blocks are missing:
+a function's `@INSTR` lines leave gaps inside its own `[start, end)` extent that
+no other function claims. 29 functions are affected, 27 of those gaps are real
+code, and all 27 decode cleanly as 16-bit instructions — in several cases jumps
+in the surrounding listing target straight into them.
+
+`tools/py/repairholes.py` fills those orphan holes by linear decode and writes
+`out/target.full.txt`, leaving the authoritative export untouched. Comparisons
+run against the repaired copy by default; `PETE_EXPORT` overrides the path if
+you want to work from the raw Ghidra output:
+
+```
+python tools\py\repairholes.py          # regenerate out/target.full.txt
+python tools\py\check.py all
+```
+
+The repair inserts 885 instructions across 24 functions. `FUN_18a2_0154` was
+unreconstructible until this existed: its listing jumped from `inc word ptr
+es:[bx+0xd]` straight to the merge, hiding a whole `y + f6 > 0x136` clamp.
+
+## Requirements
+
+* Python 3.13 with `capstone`
+* [Ghidra](https://ghidra-sre.org/) 12.1.4 + Java 21 (already used to produce
+  `out/target.txt`; only needed to re-export)
+* DOSBox X
+* Borland C++ 3.1, in `tools/bc31`
+
+Toolchain layout:
+
+| Path | Role |
+|---|---|
+| `PETE.EXE` | target executable |
+| `out/target.txt` | raw Ghidra export; the reference Ghidra produced |
+| `out/target.full.txt` | that export with missing basic blocks refilled; what comparisons use |
+| `src/*.c` | reconstructions; each carries `@target` / `@name` markers |
+| `tools/bc31` | Borland C++ 3.1, mounted read-only as `D:` |
+| `dos/dosbox.conf` | mounts `C:` -> project root, `D:` -> `tools/bc31`, sets `BCPATH=D:\` |
+| `tools/py` | the toolchain driver and analysis tools |
+| `build` | generated objects, executables, maps, assembly listings |
+| `out` | target export and machine-written results |
+
+`build` and `out/*.json` are disposable; `out/target.txt` is not.
+
+## Usage
+
+Everything is driven from `tools/py`. Every command builds inside DOSBox, so
+first runs take a few seconds.
+
+```sh
+python tools/py/check.py show 0x0F21           # disassemble a target function
+python tools/py/check.py diff 0x0F21 src/flagbits.c
+python tools/py/check.py all                   # every src/*.c, progress table
+python tools/py/check.py list                  # summary + per-function status
+python tools/py/check.py list --markdown       # regenerate README's Progress tables
+python tools/py/fitflags.py src/flagbits.c    # which flag set reproduces it
+python tools/py/search.py 0x0F36 --all         # brute-force candidate C shapes
+python tools/py/shifts.py                      # which idioms the target uses
+python tools/py/style.py                       # codegen style statistics
+python tools/py/fingerprint.py                 # runtime byte fingerprint
+```
+
+Targets can be named either by Ghidra address (`0x10F21`) or flat address
+(`0x0F21`); addresses below `0x10000` are treated as flat.
+
+### Adding a function
+
+1. `python tools/py/check.py show <addr>` and read the disassembly.
+2. Write `src/<name>.c` with the marker header:
+
+   ```c
+   /* @target 0x0F21 */
+   /* @name   flagbits_set */
+   /* @proto  void flagbits_set(unsigned char v) */
+   /* @module cross */
+   ```
+
+   `@module none|same` builds the function without a separate caller, for
+   functions the target genuinely calls near. `@flags -O1` overrides the global
+   optimisation level for that one file (see [Findings](#findings)).
+
+   `@extra  a.c b.c` lists further sources to compile and link alongside, for a
+   function whose far callees each need their own module - see `src/main.c`.
+   Keep the whole list on one line; the marker only captures the rest of its
+   line.
+3. `python tools/py/check.py diff <addr> src/<name>.c`
+4. Iterate until both tiers pass.
+
+`@proto` is load-bearing: the generated cross-module caller is built from it,
+and the argument list it synthesises must match the real call. Getting it
+wrong shows up as an unreadable stack frame, not as a compile error.
+
+## Progress
+
+Generated by `python tools/py/check.py list`; the machine-readable form is
+`out/status.json`, rewritten by `check.py all`. The tables below are the output
+of `check.py list --markdown`, so they can be regenerated rather than edited by
+hand.
+
+| Metric | Count |
+|---|---|
+| Target functions | 454 |
+| Verified shape | 20 |
+| Verified exact | 20 |
+| Attempted | 23 |
+
+| Target | Shape | Exact | Source | Bytes |
+|---|---|---|---|---|
+| `FUN_13b2_000f` | PASS | PASS | `src/main.c` | 300/300 |
+| `FUN_1fa6_006a` | fail | fail | `src/dacwrite.c` | 21/23 |
+| `FUN_1f44_00f1` | PASS | PASS | `src/clrbit3.c` | 13/13 |
+| `FUN_1f44_00fe` | PASS | PASS | `src/stsave.c` | 69/69 |
+| `FUN_1d19_0104` | PASS | PASS | `src/dblbox.c` | 70/70 |
+| `FUN_1f44_0143` | PASS | PASS | `src/statebak.c` | 69/69 |
+| `FUN_18a2_0154` | PASS | PASS | `src/clipxy.c` | 189/189 |
+| `FUN_1f44_01c3` | PASS | PASS | `src/dacupd.c` | 27/27 |
+| `FUN_1f44_01de` | fail | fail | `src/f44d.c` | 152/73 |
+| `FUN_1d19_02fe` | PASS | PASS | `src/setflds.c` | 49/49 |
+| `FUN_1d19_032f` | PASS | PASS | `src/setclass.c` | 58/58 |
+| `FUN_1f44_04c4` | PASS | PASS | `src/settag.c` | 34/34 |
+| `FUN_18a2_0620` | PASS | PASS | `src/bumpcur.c` | 26/26 |
+| `FUN_1000_07f2` | PASS | PASS | `src/setgpos.c` | 17/17 |
+| `FUN_1d19_095c` | PASS | PASS | `src/setkind.c` | 13/13 |
+| `FUN_1e25_0dde` | PASS | PASS | `src/clampv.c` | 94/94 |
+| `FUN_1000_0f21` | PASS | PASS | `src/flagbits.c` | 21/21 |
+| `FUN_1000_0f36` | fail | fail | `src/flagshft.c` | 25/24 |
+| `FUN_1000_0f4f` | PASS | PASS | `src/flagput.c` | 11/11 |
+| `FUN_18a2_0f9a` | PASS | PASS | `src/clippos.c` | 89/89 |
+| `FUN_1000_10c1` | PASS | PASS | `src/farstreq.c` | 45/45 |
+| `FUN_1000_18e4` | PASS | PASS | `src/keyread.c` | 25/25 |
+| `FUN_1000_1ae1` | PASS | PASS | `src/keypoll.c` | 18/18 |
+
+`FUN_13b2_1a40` is also byte-exact (17/17, 65/65) but lives in `src/xmod/x1a40.c`,
+outside the `src/*.c` glob `check.py all` walks, so it is absent from the table
+above. `main.c` carries its own copy of that body because the real one has to sit
+in main's module.
+
+`FUN_1000_0f36` is a documented divergence, not an unfinished reconstruction �?"
+see [Known limits](#known-limits). `FUN_1f44_01de` is a near miss whose
+target function boundary is itself suspect; both are explained under
+[Known limits](#known-limits).
+
+### Next steps
+
+Tracked in the session todo list, in priority order:
+
+1. **Add more functions.** The productive vein is functions taking a
+   `struct ... far *` and touching two or three fields, often with two or three
+   far-pointer parameters. Twelve of the sixteen exacts are that shape. See
+   [Reading the record layouts](#reading-the-record-layouts).
+2. **Settle `-O` vs `-O1`** — indistinguishable so far, identical output on every
+   probe tried.
+3. **Establish `-k`** (standard stack frame) via frame-size distribution.
+4. **Test a Borland 3.0/3.2 archive** for the `enter` / epilogue-merge / CL-shift
+   divergences.
+
+## Findings
+
+Full write-up in [`notes/compiler.md`](notes/compiler.md). The parts that
+change how you build things:
+
+**Borland C++ 3.1, large model, 80186.** Established from banner strings in the
+binary and a 76.6% byte match of the C runtime. Default flags are
+`-ml -1 -O2 -r-`.
+
+**`ret` vs `retf` is decided by module boundaries.** Borland returns *near*
+within a module (`ret`) and Turbo Link patches the callee to `retf` across
+modules. About 80% of the target's functions end in `retf`, so each
+reconstruction is built together with a generated caller in a second module.
+Skipping this makes every exact comparison fail on one byte — which reads
+convincingly like "no flag set works" when it means nothing of the sort. The ~29
+functions the target calls *within* their own module instead need
+`@module same` plus `__pascal __near`.
+
+**Arguments live at `[bp+6]` for far functions, `[bp+4]` for near ones.** Borland
+reserves a word at `[bp+4]` for the segment half of a far return address;
+`__near` drops the reservation. The target splits 256/266 far-returning
+functions at `[bp+6]` against 27/29 near-returning ones at `[bp+4]`.
+
+**`-O2`, but no single 3.1 flag set fits.** `-O2` is the only 3.1 setting that
+allocates frames with `sub sp,N`/`leave`, and the target has 100 such functions
+and **zero** `enter` — while `-O`/`-O1` emit `enter` for every framed function
+with no source-level workaround. But `-O2` also duplicates epilogues in
+frameless multi-return functions, where the target merges them (30 such
+functions, e.g. `FUN_1000_10c1`). That contradiction, plus the CL-shift blind
+spot, is strong evidence the game modules were not built by this exact compiler.
+`-O2` stays the default because it wins on function count (100 > 30), and a
+per-source `@flags` line can override it — `src/farstreq.c` uses `@flags -O1`.
+
+**`-N` is ruled out.** Stack checking grows `FUN_1000_0f21` from 21 to 32 bytes.
+
+**A far pointer parameter becomes one `les bx, [bp+6]`.** The commonest target
+shape is a record field access through a `far *` parameter, and Borland loads
+the whole pointer with a single `les` and then indexes through `es:bx` with no
+segment reload. Padding arrays in a `struct` reproduce record layouts directly.
+After the pointer, arguments continue at `[bp+6] + sizeof(param)`, so a 4-byte
+far pointer pushes the first trailing argument out to `[bp+0xa]`.
+
+### Reading the record layouts
+
+Byte offsets in the target are absolute, so a `struct` of `unsigned char`
+padding reproduces any layout, and the recovered layouts cross-check each other
+because sibling functions in a module share one record:
+
+| Record | Module | Offsets recovered |
+|---|---|---|
+| `rect_s` | `FUN_1d19_*` | +0x02, +0x04, +0x0f, +0x11, +0x13, +0x15, +0x1b, +0x1d (all `int`) |
+| `blk_s` | `FUN_1f44_*` | +0x02 `state`, +0x06 `data[0x300]`, global `tbl` at 0x3550 |
+| `set_s` / `cls_s` | `FUN_1d19_*` | +0x0b, +0x0d (`int`), +0x2b, +0x2c, +0x2d, +0x2f, +0x33, +0x37 (`char`) |
+| `rec_s` | `FUN_18a2_*` | +0x02, +0x04, +0x06, +0x08, +0x0b, +0x0d (`int`); +0x32, +0x66 (`char`); +0x65, +0x66 are **bitfields**; globals at 0x27de and 0x34a1 |
+
+Bitfields are the house style for flags, and they are directly visible in the
+generated code. Thirty functions test a flag with
+
+```
+mov al, byte ptr es:[bx + 0x65]
+shr ax, 2              ; bit position
+and ax, 1
+or ax, ax
+jz  <skip>
+```
+
+which is exactly `if (rec->bitfield)`. A plain `unsigned char` mask produces
+`test al, 4` instead and will not match.
+
+Two traps worth knowing:
+
+* **The file name is the link output name**, so `src/statesave.c` fails to build
+  as `STATESAVE` (9 characters). Keep the file base at 8 or fewer; `stsave.c`
+  and `setflds.c` exist for this reason.
+* **Record header size shows up as an immediate.** In `statesave` the data array
+  starts at offset 6, not 3, and the only symptom is `add ax, 3` versus the
+  target's `add ax, 6` — shape still passes 100% while exact fails.
+
+**Signedness is readable straight off the branch opcode.** `FUN_18a2_0620` uses
+`jle` (7C) where an unsigned compare would be `jbe` (76), which proves the
+counter field is `int` and not `unsigned int`. Switching that one declaration
+took the function from 60% to byte-exact. Conversely `sar` versus `shr` in
+`dblbox` fixes signedness of the halved fields.
+
+**`<<= 1` and `*= 2` are not the same code.** Borland emits `mov dx,2 / imul dx`
+for `u *= 2`, which grew `dblbox` from 70 to 86 bytes; the target's
+`shl word ptr [bp + 0xa], 1` needs `u <<= 1`. Writing back through a parameter
+slot is normal — Borland stores the doubled value into `[bp + 0xa]`.
+
+**Chain assignment is how a constant gets loaded into a register once.** Three
+separate `field = 0;` statements give `mov byte ptr es:[bx+5],0` three times
+over, but the target's
+
+```
+mov al, 0
+mov byte ptr es:[bx + 5], al
+mov byte ptr es:[bx], al
+mov byte ptr es:[bx + 4], al
+```
+
+is `c->f4 = c->f0 = c->f5 = 0;` — chain assignment evaluates the right-hand
+side once, into `al`, then stores right-to-left. The store order (5, 0, 4) is
+the fingerprint that gives it away. A local `unsigned char z = 0;` does *not*
+work: Borland spills it to the stack and emits `sub sp,2`, and `register` does
+not help either.
+
+**Build-name and `main` traps.** Output names must be 8.3-safe (max 8 chars, no
+dots) or DOS truncates them silently and the artefacts go missing. Exactly one
+source may define `main`; a duplicate `_MAIN` makes Turbo Link loop forever
+writing multi-gigabyte map files. `bcbuild.py` pre-checks both and deletes
+runaway artefacts.
+
+**Turbo Link MAP segment table.** `Start`/`Stop`/`Length` are load-module
+*byte* offsets, not paragraph counts. Publics are `SSSS:OOOO` and flatten as
+`SSSS*16+OOOO`.
+
+## Known limits
+
+**`FUN_1000_0f36` — constant shift through CL.** The target emits
+`mov cl,4 / shl dl,cl`; BCC 3.1 folds `v << 4` to `shl dl,4` at every
+optimisation level. `shl r/m8,cl` is the only 8-bit shift x86 encodes, so the
+count must have reached the shift as a variable Borland had constant-propagated
+into CL and then declined to re-fold.
+
+This is systematic, not a one-off: **27 such sites across 24 of 453 functions**,
+including `mov cl,8 / shl ax,cl` on 16-bit shifts. `search.py` swept ~30 source
+shapes against 13 flag sets and found no match; the closest,
+`static const unsigned char n = 4`, reproduces every other instruction exactly
+and differs only in the count's storage (`mov cl,[n]` vs `mov cl,4`, 27 vs 25
+bytes).
+
+Conclusion: PETE.EXE's game modules were built by a Borland version whose
+optimiser differs from 3.1's, even though the 3.1 runtime matches. The `enter`
+versus `sub sp` split and the epilogue-merging behaviour described under
+[Findings](#findings) point the same way, so this is now the third independent
+idiom saying the game modules came from a different compiler.
+`src/flagshft.c` keeps the readable literal form rather than contorting the
+source to hit 25 bytes. Affects ~5% of functions; do not spend time hand-tuning
+source for these.
+
+**Turbo C runtime code is labelled as game functions.** `FUN_1000_097c` sits in
+the 0x900-0x9ff cluster and looks like a frameless `strlen`, but its sole caller
+sets `DI` and reads the length from `CX` — it is Borland's register-convention
+RTL `strlen`, not game code. Functions in that cluster, and anything reached
+through `int 0x21`/`int 0x10` wrappers, should be excluded from reconstruction.
+
+**FPU modules do not link.** Any probe containing `double` crashes Turbo Link
+before its banner. PETE.EXE has no meaningful FPU code, so this is unaddressed
+rather than worked around.
+
+**Aggregate calibration is weak.** `style.py` needs a large sample to say
+anything and has not discriminated; `fitflags.py` inverting the problem onto one
+known function is the tool that works.
+
+## Notes
+
+Editor diagnostics claiming `capstone` is missing, or flagging
+`TextIO.reconfigure` and nullable `TargetDB.resolve()` results, are false or
+stale — the runtime is fine. The `tools/py/dis.py` diagnostic is stale; that
+module was renamed to `dosimg.py` to stop shadowing the standard library's
+`dis`.

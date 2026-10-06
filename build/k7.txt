@@ -1,0 +1,125 @@
+﻿
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPILER ASSEMBLY (bcc -S)  -- Borland's own listing for this source
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  	.286
+  	ifndef	??version
+  ?debug	macro
+  	endm
+  publicdll macro	name
+  	public	name
+  	endm
+  $comm	macro	name,dist,size,count
+  	comm	dist name:BYTE:count*size
+  	endm
+  	else
+  $comm	macro	name,dist,size,count
+  	comm	dist name[size]:BYTE:count
+  	endm
+  	endif
+  	?debug	V 300h
+  	?debug	S "keyread.c"
+  	?debug	C E9D491445D096B6579726561642E63
+  KEYREAD_TEXT	segment byte public 'CODE'
+  KEYREAD_TEXT	ends
+  DGROUP	group	_DATA,_BSS
+  	assume	cs:KEYREAD_TEXT,ds:DGROUP
+  _DATA	segment word public 'DATA'
+  d@	label	byte
+  d@w	label	word
+  _DATA	ends
+  _BSS	segment word public 'BSS'
+  b@	label	byte
+  b@w	label	word
+  _BSS	ends
+  KEYREAD_TEXT	segment byte public 'CODE'
+     ;	
+     ;	unsigned char key_read(void)
+     ;	
+  	assume	cs:KEYREAD_TEXT
+  _key_read	proc	far
+     ;	
+     ;	{
+     ;	    if (g_2444) {
+     ;	
+  	cmp	byte ptr DGROUP:_g_2444,0
+  	je	short @1@58
+     ;	
+     ;	        g_2444 = 0;
+     ;	
+  	mov	byte ptr DGROUP:_g_2444,0
+     ;	
+     ;	        _AL = g_2445;
+     ;	
+  	mov	al,byte ptr DGROUP:_g_2445
+     ;	
+     ;	    } else {
+     ;	
+  	jmp	short @1@114
+  @1@58:
+     ;	
+     ;	        asm {
+     ;	            mov ax, 0700h
+     ;	
+  	mov	 ax, 0700h
+     ;	
+     ;	            int 21h
+     ;	
+  	int	 21h
+  @1@114:
+     ;	
+     ;	        }
+     ;	    }
+     ;	    _AH = 0;
+     ;	
+  	mov	ah,0
+     ;	
+     ;	    return _AX;
+     ;	
+     ;	
+     ;	}
+     ;	
+  	ret	
+  _key_read	endp
+  KEYREAD_TEXT	ends
+  _BSS	segment word public 'BSS'
+  _g_2445	label	byte
+  	db	1 dup (?)
+  _g_2444	label	byte
+  	db	1 dup (?)
+  	?debug	C E9
+  	?debug	C FA00000000
+  _BSS	ends
+  _DATA	segment word public 'DATA'
+  s@	label	byte
+  _DATA	ends
+  KEYREAD_TEXT	segment byte public 'CODE'
+  KEYREAD_TEXT	ends
+  	public	_key_read
+  	public	_g_2445
+  	public	_g_2444
+  _s@	equ	s@
+  	end
+  
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPARISON   target FUN_1000_18e4  vs  mine _KEY_READ
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  shape : PASS   9/9 instructions   (100.0%)
+  exact : PASS   9/9 instructions   (100.0%)
+  size  : target 25 bytes / mine 25 bytes   ok
+
+  target    instruction                                | mine      instruction
+  --------------------------------------------------------------------------------------------------------
+  18E4   cmp byte ptr [0x2444], 0                     |  1097   cmp byte ptr [0x2c7], 0                     
+  18E9   je 0x18f5                                    |  109C   je 0x10a8                                   
+  18EB   mov byte ptr [0x2444], 0                     |  109E   mov byte ptr [0x2c7], 0                     
+  18F0   mov al, byte ptr [0x2445]                    |  10A3   mov al, byte ptr [0x2c6]                    
+  18F3   jmp 0x18fa                                   |  10A6   jmp 0x10ad                                  
+  18F5   mov ax, 0x700                                |  10A8   mov ax, 0x700                               
+  18F8   int 0x21                                     |  10AB   int 0x21                                    
+  18FA   mov ah, 0                                    |  10AD   mov ah, 0                                   
+  18FC   retf                                         |  10AF   retf                                        
+
+  address correspondence (masked in the exact tier -- verify these):
+    insn 5    addr:?         -> addr:?

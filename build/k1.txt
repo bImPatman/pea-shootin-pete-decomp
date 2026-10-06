@@ -1,0 +1,113 @@
+﻿
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPILER ASSEMBLY (bcc -S)  -- Borland's own listing for this source
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  	.286
+  	ifndef	??version
+  ?debug	macro
+  	endm
+  publicdll macro	name
+  	public	name
+  	endm
+  $comm	macro	name,dist,size,count
+  	comm	dist name:BYTE:count*size
+  	endm
+  	else
+  $comm	macro	name,dist,size,count
+  	comm	dist name[size]:BYTE:count
+  	endm
+  	endif
+  	?debug	V 300h
+  	?debug	S "keypoll.c"
+  	?debug	C E94391445D096B6579706F6C6C2E63
+  KEYPOLL_TEXT	segment byte public 'CODE'
+  KEYPOLL_TEXT	ends
+  DGROUP	group	_DATA,_BSS
+  	assume	cs:KEYPOLL_TEXT,ds:DGROUP
+  _DATA	segment word public 'DATA'
+  d@	label	byte
+  d@w	label	word
+  _DATA	ends
+  _BSS	segment word public 'BSS'
+  b@	label	byte
+  b@w	label	word
+  _BSS	ends
+  KEYPOLL_TEXT	segment byte public 'CODE'
+     ;	
+     ;	long key_poll(void)
+     ;	
+  	assume	cs:KEYPOLL_TEXT
+  _key_poll	proc	far
+     ;	
+     ;	{
+     ;	    if (g_2444)
+     ;	
+  	cmp	byte ptr DGROUP:_g_2444,0
+  	je	short @1@58
+     ;	
+     ;	        return 1;
+     ;	
+  	xor	dx,dx
+  	mov	ax,1
+  	ret	
+  @1@58:
+     ;	
+     ;	    g_2444 = 0x0b;
+     ;	
+  	mov	byte ptr DGROUP:_g_2444,11
+     ;	
+     ;	    asm {
+     ;	        mov ah, 0bh
+     ;	
+  	mov	 ah, 0bh
+     ;	
+     ;	        int 21h
+     ;	
+  	int	 21h
+     ;	
+     ;	    }
+     ;	    return _AX;
+     ;	
+  	xor	dx,dx
+     ;	
+     ;	}
+     ;	
+  	ret	
+  _key_poll	endp
+  KEYPOLL_TEXT	ends
+  _BSS	segment word public 'BSS'
+  _g_2444	label	byte
+  	db	1 dup (?)
+  	?debug	C E9
+  	?debug	C FA00000000
+  _BSS	ends
+  _DATA	segment word public 'DATA'
+  s@	label	byte
+  _DATA	ends
+  KEYPOLL_TEXT	segment byte public 'CODE'
+  KEYPOLL_TEXT	ends
+  	public	_key_poll
+  	public	_g_2444
+  _s@	equ	s@
+  	end
+  
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPARISON   target FUN_1000_1ae1  vs  mine _KEY_POLL
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  shape : FAIL   2/8 instructions   (25.0%)
+  exact : FAIL   1/10 instructions   (10.0%)
+  size  : target 18 bytes / mine 25 bytes   MISMATCH
+
+  target    instruction                                | mine      instruction
+  --------------------------------------------------------------------------------------------------------
+  1AE1   cmp byte ptr [0x2444], 0                     |  1097   cmp byte ptr [0x2c6], 0                     
+  1AE6   je 0x1aed                                    |  109C   je 0x10a4                                   
+  1AE8   mov ax, 1                                    |  109E   xor dx, dx                                    <<<< first difference
+  1AEB   jmp 0x1af2                                   |  10A0   mov ax, 1                                   
+  1AED   mov ah, 0xb                                  |  10A3   retf                                        
+  1AEF   int 0x21                                     |  10A4   mov byte ptr [0x2c6], 0xb                   
+  1AF1   cwde                                         |  10A9   mov ah, 0xb                                 
+  1AF2   retf                                         |  10AB   int 0x21                                    
+                                                      |  10AD   xor dx, dx                                  
+                                                      |  10AF   retf                                        

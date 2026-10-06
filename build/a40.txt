@@ -1,0 +1,138 @@
+﻿
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPILER ASSEMBLY (bcc -S)  -- Borland's own listing for this source
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  	.286
+  	ifndef	??version
+  ?debug	macro
+  	endm
+  publicdll macro	name
+  	public	name
+  	endm
+  $comm	macro	name,dist,size,count
+  	comm	dist name:BYTE:count*size
+  	endm
+  	else
+  $comm	macro	name,dist,size,count
+  	comm	dist name[size]:BYTE:count
+  	endm
+  	endif
+  	?debug	V 300h
+  	?debug	S "x1a40.c"
+  	?debug	C E99B92445D0778316134302E63
+  X1A40_TEXT	segment byte public 'CODE'
+  X1A40_TEXT	ends
+  DGROUP	group	_DATA,_BSS
+  	assume	cs:X1A40_TEXT,ds:DGROUP
+  _DATA	segment word public 'DATA'
+  d@	label	byte
+  d@w	label	word
+  _DATA	ends
+  _BSS	segment word public 'BSS'
+  b@	label	byte
+  b@w	label	word
+  _BSS	ends
+  X1A40_TEXT	segment byte public 'CODE'
+     ;	
+     ;	void m_1a40(void)
+     ;	
+  	assume	cs:X1A40_TEXT
+  _m_1a40	proc	far
+     ;	
+     ;	{
+     ;	    node_free(g_34a9);
+     ;	
+  	push	word ptr DGROUP:_g_34a9+2
+  	push	word ptr DGROUP:_g_34a9
+  	call	far ptr _node_free
+  	add	sp,4
+     ;	
+     ;	    statebak(g_3858);
+     ;	
+  	push	word ptr DGROUP:_g_3858+2
+  	push	word ptr DGROUP:_g_3858
+  	call	far ptr _statebak
+  	add	sp,4
+     ;	
+     ;	    clrbit3(g_3858);
+     ;	
+  	push	word ptr DGROUP:_g_3858+2
+  	push	word ptr DGROUP:_g_3858
+  	call	far ptr _clrbit3
+  	add	sp,4
+     ;	
+     ;	    buf_to_vga(g_27aa);
+     ;	
+  	push	word ptr DGROUP:_g_27aa+2
+  	push	word ptr DGROUP:_g_27aa
+  	call	far ptr _buf_to_vga
+  	add	sp,4
+     ;	
+     ;	}
+     ;	
+  	ret	
+  _m_1a40	endp
+  X1A40_TEXT	ends
+  _BSS	segment word public 'BSS'
+  _g_3858	label	dword
+  	db	4 dup (?)
+  _g_27aa	label	dword
+  	db	4 dup (?)
+  _g_34a9	label	dword
+  	db	4 dup (?)
+  	?debug	C E9
+  	?debug	C FA00000000
+  _BSS	ends
+  _DATA	segment word public 'DATA'
+  s@	label	byte
+  _DATA	ends
+  X1A40_TEXT	segment byte public 'CODE'
+  X1A40_TEXT	ends
+  	public	_m_1a40
+  	public	_g_3858
+  	public	_g_27aa
+  	public	_g_34a9
+  	extrn	_clrbit3:far
+  	extrn	_statebak:far
+  	extrn	_buf_to_vga:far
+  	extrn	_node_free:far
+  _s@	equ	s@
+  	end
+  
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPARISON   target FUN_13b2_1a40  vs  mine _M_1A40
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  shape : PASS   17/17 instructions   (100.0%)
+  exact : PASS   17/17 instructions   (100.0%)
+  size  : target 65 bytes / mine 65 bytes   ok
+
+  target    instruction                                | mine      instruction
+  --------------------------------------------------------------------------------------------------------
+  5560   push word ptr [0x34ab]                       |  1097   push word ptr [0x2d0]                       
+  5564   push word ptr [0x34a9]                       |  109B   push word ptr [0x2ce]                       
+  5568   lcall 0xb11, 0x2024                          |  109F   lcall 0x112, 0xa                            
+  556D   add sp, 4                                    |  10A4   add sp, 4                                   
+  5570   push word ptr [0x385a]                       |  10A7   push word ptr [0x2c8]                       
+  5574   push word ptr [0x3858]                       |  10AB   push word ptr [0x2c6]                       
+  5578   lcall 0xf44, 0x143                           |  10AF   lcall 0x10d, 8                              
+  557D   add sp, 4                                    |  10B4   add sp, 4                                   
+  5580   push word ptr [0x385a]                       |  10B7   push word ptr [0x2c8]                       
+  5584   push word ptr [0x3858]                       |  10BB   push word ptr [0x2c6]                       
+  5588   lcall 0xf44, 0xf1                            |  10BF   lcall 0x111, 0xd                            
+  558D   add sp, 4                                    |  10C4   add sp, 4                                   
+  5590   push word ptr [0x27ac]                       |  10C7   push word ptr [0x2cc]                       
+  5594   push word ptr [0x27aa]                       |  10CB   push word ptr [0x2ca]                       
+  5598   lcall 0xe25, 0xb0f                           |  10CF   lcall 0x112, 0xf                            
+  559D   add sp, 4                                    |  10D4   add sp, 4                                   
+  55A0   retf                                         |  10D7   retf                                        
+
+  address correspondence (masked in the exact tier -- verify these):
+    insn 2    far:?          -> far:?
+    insn 2    far:?          -> far:?
+    insn 6    far:?          -> far:?
+    insn 6    far:?          -> far:?
+    insn 10   far:?          -> far:?
+    insn 10   far:?          -> far:?
+    insn 14   far:?          -> far:?
+    insn 14   far:?          -> far:?

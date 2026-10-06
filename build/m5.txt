@@ -1,0 +1,563 @@
+﻿  @extra: missing source C:\Users\patri\pea-shoot\src\stubs;
+  @extra: missing source C:\Users\patri\pea-shoot\src\those
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPILER ASSEMBLY (bcc -S)  -- Borland's own listing for this source
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  	.286
+  	ifndef	??version
+  ?debug	macro
+  	endm
+  publicdll macro	name
+  	public	name
+  	endm
+  $comm	macro	name,dist,size,count
+  	comm	dist name:BYTE:count*size
+  	endm
+  	else
+  $comm	macro	name,dist,size,count
+  	comm	dist name[size]:BYTE:count
+  	endm
+  	endif
+  	?debug	V 300h
+  	?debug	S "main.c"
+  	?debug	C E9278F445D066D61696E2E63
+  	?debug	C E94019CA1813443A5C494E434C5544455C737472696E672E68
+  	?debug	C E94019CA1812443A5C494E434C5544455C5F646566732E68
+  	?debug	C E94019CA1812443A5C494E434C5544455C5F6E756C6C2E68
+  MAIN_TEXT	segment byte public 'CODE'
+  MAIN_TEXT	ends
+  DGROUP	group	_DATA,_BSS
+  	assume	cs:MAIN_TEXT,ds:DGROUP
+  _DATA	segment word public 'DATA'
+  d@	label	byte
+  d@w	label	word
+  _DATA	ends
+  _BSS	segment word public 'BSS'
+  b@	label	byte
+  b@w	label	word
+  _BSS	ends
+  MAIN_TEXT	segment byte public 'CODE'
+     ;	
+     ;	int main(int argc, char far *argv[], char far *envp[])
+     ;	
+  	assume	cs:MAIN_TEXT
+  _main	proc	far
+  	push	bp
+  	mov	bp,sp
+  	push	si
+  	push	di
+     ;	
+     ;	{
+     ;	    if (strcmp(argv[1], g_cmd) == 0)
+     ;	
+  	les	bx,dword ptr [bp+8]
+  	mov	ax,word ptr es:[bx+6]
+  	mov	si,word ptr es:[bx+4]
+  	push	ds
+  	pop	es
+  	mov	di,offset DGROUP:_g_cmd
+  	push	ax
+  	xor	ax,ax
+  	mov	cx,-1
+  	repnz 	scasb	
+  	not	cx
+  	sub	di,cx
+  	mov	ax,ds
+  	pop	ds
+  	push	ax
+  	xor	ax,ax
+  	repz 	cmpsb	
+  	pop	ds
+  	je	short @1@86
+  	sbb	ax,ax
+  	sbb	ax,-1
+  @1@86:
+  	or	ax,ax
+  	jne	short @1@142
+     ;	
+     ;	        g_2c60 = 1;
+     ;	
+  	mov	byte ptr DGROUP:_g_2c60,1
+  	jmp	short @1@170
+  @1@142:
+     ;	
+     ;	    else
+     ;	        g_2c60 = 0;
+     ;	
+  	mov	byte ptr DGROUP:_g_2c60,0
+  @1@170:
+     ;	
+     ;	
+     ;	    m_1df6();
+     ;	
+  	call	far ptr _m_1df6
+  @1@198:
+     ;	
+     ;	
+     ;	init_loop:
+     ;	    if (g_2c60 == 0)
+     ;	
+  	cmp	byte ptr DGROUP:_g_2c60,0
+  	jne	short @1@254
+     ;	
+     ;	        m_38a2();
+     ;	
+  	call	far ptr _m_38a2
+  @1@254:
+     ;	
+     ;	    m_2415();
+     ;	
+  	call	far ptr _m_2415
+     ;	
+     ;	    m_24e7(1);
+     ;	
+  	push	1
+  	call	far ptr _m_24e7
+  	add	sp,2
+     ;	
+     ;	    goto check;
+     ;	
+  	jmp	@1@338
+  @1@282:
+     ;	
+     ;	
+     ;	frame:
+     ;	    g_349f = g_349e ^ 1;
+     ;	
+  	mov	al,byte ptr DGROUP:_g_349e
+  	xor	al,1
+  	mov	byte ptr DGROUP:_g_349f,al
+     ;	
+     ;	    m_0dd6();
+     ;	
+  	call	far ptr _m_0dd6
+     ;	
+     ;	    m_b11a(g_34a9);
+     ;	
+  	push	word ptr DGROUP:_g_34a9+2
+  	push	word ptr DGROUP:_g_34a9
+  	call	far ptr _m_b11a
+  	add	sp,4
+     ;	
+     ;	    m_154f(0);
+     ;	
+  	push	0
+  	call	far ptr _m_154f
+  	add	sp,2
+     ;	
+     ;	    m_f44d(g_3858);
+     ;	
+  	push	word ptr DGROUP:_g_3858+2
+  	push	word ptr DGROUP:_g_3858
+  	call	far ptr _m_f44d
+  	add	sp,4
+     ;	
+     ;	    g_349e = g_349f;
+     ;	
+  	mov	al,byte ptr DGROUP:_g_349f
+  	mov	byte ptr DGROUP:_g_349e,al
+     ;	
+     ;	    m_f44b(g_3858, g_349f);
+     ;	
+  	push	ax
+  	push	word ptr DGROUP:_g_3858+2
+  	push	word ptr DGROUP:_g_3858
+  	call	far ptr _m_f44b
+  	add	sp,6
+     ;	
+     ;	    m_f44c(g_3858);
+     ;	
+  	push	word ptr DGROUP:_g_3858+2
+  	push	word ptr DGROUP:_g_3858
+  	call	far ptr _m_f44c
+  	add	sp,4
+     ;	
+     ;	    m_e256(g_27aa);
+     ;	
+  	push	word ptr DGROUP:_g_27aa+2
+  	push	word ptr DGROUP:_g_27aa
+  	call	far ptr _m_e256
+  	add	sp,4
+     ;	
+     ;	    m_013b();
+     ;	
+  	call	far ptr _m_013b
+     ;	
+     ;	
+     ;	    if (g_27f3) {
+     ;	
+  	cmp	byte ptr DGROUP:_g_27f3,0
+  	je	short @1@338
+     ;	
+     ;	        m_1a40();
+     ;	
+  	call	far ptr _m_1a40
+     ;	
+     ;	        goto tail;
+     ;	
+  	jmp	short @1@366
+  @1@338:
+     ;	
+     ;	    }
+     ;	
+     ;	check:
+     ;	    if (!g_27fc)
+     ;	
+  	mov	al,byte ptr DGROUP:_g_27fc
+  	mov	ah,0
+  	or	ax,ax
+  	jne	@@0
+  	jmp	@1@282
+  @@0:
+  @1@366:
+     ;	
+     ;	        goto frame;
+     ;	
+     ;	tail:
+     ;	    m_b159(g_34ad);
+     ;	
+  	push	word ptr DGROUP:_g_34ad+2
+  	push	word ptr DGROUP:_g_34ad
+  	call	far ptr _m_b159
+  	add	sp,4
+     ;	
+     ;	    if (g_386d) {
+     ;	
+  	cmp	byte ptr DGROUP:_g_386d,0
+  	je	short @1@506
+  	jmp	short @1@450
+  @1@422:
+     ;	
+     ;	        while (m_f1ae())
+     ;	            m_f18e();
+     ;	
+  	call	far ptr _m_f18e
+  @1@450:
+  	call	far ptr _m_f1ae
+  	or	ax,ax
+  	jne	short @1@422
+     ;	
+     ;	    } else {
+     ;	
+  	jmp	@1@198
+  @1@506:
+     ;	
+     ;	        m_34e5();
+     ;	
+  	call	far ptr _m_34e5
+     ;	
+     ;	        m_35dd();
+     ;	
+  	call	far ptr _m_35dd
+  	jmp	@1@198
+     ;	
+     ;	    }
+     ;	    goto init_loop;
+     ;	}
+     ;	
+  	pop	di
+  	pop	si
+  	pop	bp
+  	ret	
+  _main	endp
+     ;	
+     ;	void m_1df6(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_1df6	proc	far
+  	ret	
+  _m_1df6	endp
+     ;	
+     ;	void m_38a2(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_38a2	proc	far
+  	ret	
+  _m_38a2	endp
+     ;	
+     ;	void m_2415(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_2415	proc	far
+  	ret	
+  _m_2415	endp
+     ;	
+     ;	void m_24e7(int v) { v; }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_24e7	proc	far
+  	push	bp
+  	mov	bp,sp
+  	pop	bp
+  	ret	
+  _m_24e7	endp
+     ;	
+     ;	void m_0dd6(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_0dd6	proc	far
+  	ret	
+  _m_0dd6	endp
+     ;	
+     ;	void m_154f(int v) { v; }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_154f	proc	far
+  	push	bp
+  	mov	bp,sp
+  	pop	bp
+  	ret	
+  _m_154f	endp
+     ;	
+     ;	void m_013b(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_013b	proc	far
+  	ret	
+  _m_013b	endp
+     ;	
+     ;	void m_1a40(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_1a40	proc	far
+  	ret	
+  _m_1a40	endp
+     ;	
+     ;	void m_34e5(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_34e5	proc	far
+  	ret	
+  _m_34e5	endp
+     ;	
+     ;	void m_35dd(void) { }
+     ;	
+  	assume	cs:MAIN_TEXT
+  _m_35dd	proc	far
+  	ret	
+  _m_35dd	endp
+  MAIN_TEXT	ends
+  _BSS	segment word public 'BSS'
+  _g_3858	label	dword
+  	db	4 dup (?)
+  _g_34ad	label	dword
+  	db	4 dup (?)
+  _g_34a9	label	dword
+  	db	4 dup (?)
+  _g_27aa	label	dword
+  	db	4 dup (?)
+  _g_386d	label	byte
+  	db	1 dup (?)
+  _g_27fc	label	byte
+  	db	1 dup (?)
+  _g_27f3	label	byte
+  	db	1 dup (?)
+  _g_349f	label	byte
+  	db	1 dup (?)
+  _g_349e	label	byte
+  	db	1 dup (?)
+  _g_2c60	label	byte
+  	db	1 dup (?)
+  _g_cmd	label	byte
+  	db	80 dup (?)
+  	?debug	C E9
+  	?debug	C FA80000000
+  _BSS	ends
+  _DATA	segment word public 'DATA'
+  s@	label	byte
+  _DATA	ends
+  MAIN_TEXT	segment byte public 'CODE'
+  MAIN_TEXT	ends
+  	extrn	__setenvp__:far
+  	extrn	__setargv__:far
+  	public	_main
+  	public	_g_3858
+  	public	_g_34ad
+  	public	_g_34a9
+  	public	_g_27aa
+  	public	_g_386d
+  	public	_g_27fc
+  	public	_g_27f3
+  	public	_g_349f
+  	public	_g_349e
+  	public	_g_2c60
+  	public	_g_cmd
+  	public	_m_35dd
+  	public	_m_34e5
+  	public	_m_1a40
+  	public	_m_013b
+  	public	_m_154f
+  	public	_m_0dd6
+  	public	_m_24e7
+  	public	_m_2415
+  	public	_m_38a2
+  	public	_m_1df6
+  	extrn	_m_f1ae:far
+  	extrn	_m_f18e:far
+  	extrn	_m_b159:far
+  	extrn	_m_e256:far
+  	extrn	_m_f44c:far
+  	extrn	_m_f44b:far
+  	extrn	_m_f44d:far
+  	extrn	_m_b11a:far
+  _s@	equ	s@
+  	end
+  
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ COMPARISON   target FUN_13b2_000f  vs  mine _MAIN
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  shape : FAIL   55/114 instructions   (48.2%)
+  exact : FAIL   114/118 instructions   (96.6%)
+  size  : target 296 bytes / mine 300 bytes   MISMATCH
+
+  target    instruction                                | mine      instruction
+  --------------------------------------------------------------------------------------------------------
+  3B2F   push bp                                      |  121A   push bp                                     
+  3B30   mov bp, sp                                   |  121B   mov bp, sp                                  
+  3B32   push si                                      |  121D   push si                                     
+  3B33   push di                                      |  121E   push di                                     
+  3B34   les bx, ptr [bp + 8]                         |  121F   les bx, ptr [bp + 8]                        
+  3B37   mov ax, word ptr es:[bx + 6]                 |  1222   mov ax, word ptr es:[bx + 6]                
+  3B3B   mov si, word ptr es:[bx + 4]                 |  1226   mov si, word ptr es:[bx + 4]                
+  3B3F   push ds                                      |  122A   push ds                                     
+  3B40   pop es                                       |  122B   pop es                                      
+  3B41   mov di, 0x8bc                                |  122C   mov di, 0x2fc                               
+  3B44   push ax                                      |  122F   push ax                                     
+  3B45   xor ax, ax                                   |  1230   xor ax, ax                                  
+  3B47   mov cx, 0xffff                               |  1232   mov cx, 0xffff                              
+  3B4A   repne scasb al, byte ptr es:[di]             |  1235   repne scasb al, byte ptr es:[di]            
+  3B4C   not cx                                       |  1237   not cx                                      
+  3B4E   sub di, cx                                   |  1239   sub di, cx                                  
+  3B50   mov ax, ds                                   |  123B   mov ax, ds                                  
+  3B52   pop ds                                       |  123D   pop ds                                      
+  3B53   push ax                                      |  123E   push ax                                     
+  3B54   xor ax, ax                                   |  123F   xor ax, ax                                  
+  3B56   repe cmpsb byte ptr [si], byte ptr es:[di]   |  1241   repe cmpsb byte ptr [si], byte ptr es:[di]  
+  3B58   pop ds                                       |  1243   pop ds                                      
+  3B59   je 0x3b60                                    |  1244   je 0x124b                                   
+  3B5B   sbb ax, ax                                   |  1246   sbb ax, ax                                  
+  3B5D   sbb ax, 0xffff                               |  1248   sbb ax, 0xffff                              
+  3B60   or ax, ax                                    |  124B   or ax, ax                                   
+  3B62   jne 0x3b6b                                   |  124D   jne 0x1256                                  
+  3B64   mov byte ptr [0x2c60], 1                     |  124F   mov byte ptr [0x2fb], 1                     
+  3B69   jmp 0x3b70                                   |  1254   jmp 0x125b                                  
+  3B6B   mov byte ptr [0x2c60], 0                     |  1256   mov byte ptr [0x2fb], 0                     
+  3B70   nop                                          |  125B   nop                                         
+  3B71   push cs                                      |  125C   push cs                                     
+  3B72   call 0x5916                                  |  125D   call 0x1346                                 
+  3B75   cmp byte ptr [0x2c60], 0                     |  1260   cmp byte ptr [0x2fb], 0                     
+  3B7A   jne 0x3b81                                   |  1265   jne 0x126c                                  
+  3B7C   nop                                          |  1267   nop                                         
+  3B7D   push cs                                      |  1268   push cs                                     
+  3B7E   call 0x73c2                                  |  1269   call 0x1347                                 
+  3B81   nop                                          |  126C   nop                                         
+  3B82   push cs                                      |  126D   push cs                                     
+  3B83   call 0x5f35                                  |  126E   call 0x1348                                 
+  3B86   push 1                                       |  1271   push 1                                      
+  3B88   nop                                          |  1273   nop                                         
+  3B89   push cs                                      |  1274   push cs                                     
+  3B8A   call 0x6007                                  |  1275   call 0x1349                                 
+  3B8D   add sp, 2                                    |  1278   add sp, 2                                   
+  3B90   jmp 0x3c14                                   |  127B   jmp 0x12ff                                  
+  3B93   mov al, byte ptr [0x349e]                    |  127E   mov al, byte ptr [0x2fa]                    
+  3B96   xor al, 1                                    |  1281   xor al, 1                                   
+  3B98   mov byte ptr [0x349f], al                    |  1283   mov byte ptr [0x2f9], al                    
+  3B9B   nop                                          |  1286   nop                                         
+  3B9C   push cs                                      |  1287   push cs                                     
+  3B9D   call 0x48f6                                  |  1288   call 0x134e                                 
+  3BA0   push word ptr [0x34ab]                       |  128B   push word ptr [0x2f0]                       
+  3BA4   push word ptr [0x34a9]                       |  128F   push word ptr [0x2ee]                       
+  3BA8   lcall 0xb11, 0x1a94                          |  1293   lcall 0x135, 8                                <<<< first difference
+  3BAD   add sp, 4                                    |  1298   add sp, 4                                   
+  3BB0   push 0                                       |  129B   push 0                                      
+  3BB2   nop                                          |  129D   nop                                         
+  3BB3   push cs                                      |  129E   push cs                                     
+  3BB4   call 0x506f                                  |  129F   call 0x134f                                 
+  3BB7   add sp, 2                                    |  12A2   add sp, 2                                   
+  3BBA   push word ptr [0x385a]                       |  12A5   push word ptr [0x2e8]                       
+  3BBE   push word ptr [0x3858]                       |  12A9   push word ptr [0x2e6]                       
+  3BC2   lcall 0xf44, 0x1de                           |  12AD   lcall 0x136, 0xc                            
+  3BC7   add sp, 4                                    |  12B2   add sp, 4                                   
+  3BCA   mov al, byte ptr [0x349f]                    |  12B5   mov al, byte ptr [0x2f9]                    
+  3BCD   mov byte ptr [0x349e], al                    |  12B8   mov byte ptr [0x2fa], al                    
+  3BD0   push ax                                      |  12BB   push ax                                     
+  3BD1   push word ptr [0x385a]                       |  12BC   push word ptr [0x2e8]                       
+  3BD5   push word ptr [0x3858]                       |  12C0   push word ptr [0x2e6]                       
+  3BD9   lcall 0xf44, 0x29e                           |  12C4   lcall 0x138, 0                              
+  3BDE   add sp, 6                                    |  12C9   add sp, 6                                   
+  3BE1   push word ptr [0x385a]                       |  12CC   push word ptr [0x2e8]                       
+  3BE5   push word ptr [0x3858]                       |  12D0   push word ptr [0x2e6]                       
+  3BE9   lcall 0xf44, 0x1c3                           |  12D4   lcall 0x139, 0xf                            
+  3BEE   add sp, 4                                    |  12D9   add sp, 4                                   
+  3BF1   push word ptr [0x27ac]                       |  12DC   push word ptr [0x2f4]                       
+  3BF5   push word ptr [0x27aa]                       |  12E0   push word ptr [0x2f2]                       
+  3BF9   lcall 0xe25, 0x256                           |  12E4   lcall 0x13b, 3                              
+  3BFE   add sp, 4                                    |  12E9   add sp, 4                                   
+  3C01   nop                                          |  12EC   nop                                         
+  3C02   push cs                                      |  12ED   push cs                                     
+  3C03   call 0x3c5b                                  |  12EE   call 0x1354                                 
+  3C06   cmp byte ptr [0x27f3], 0                     |  12F1   cmp byte ptr [0x2f8], 0                     
+  3C0B   je 0x3c14                                    |  12F6   je 0x12ff                                   
+  3C0D   nop                                          |  12F8   nop                                         
+  3C0E   push cs                                      |  12F9   push cs                                     
+  3C0F   call 0x5560                                  |  12FA   call 0x1355                                 
+  3C12   jmp 0x3c20                                   |  12FD   jmp 0x130b                                  
+  3C14   mov al, byte ptr [0x27fc]                    |  12FF   mov al, byte ptr [0x2f7]                    
+  3C17   mov ah, 0                                    |  1302   mov ah, 0                                   
+  3C19   or ax, ax                                    |  1304   or ax, ax                                   
+  3C1B   jne 0x3c20                                   |  1306   jne 0x130b                                  
+  3C1D   jmp 0x3b93                                   |  1308   jmp 0x127e                                  
+  3C20   push word ptr [0x34af]                       |  130B   push word ptr [0x2ec]                       
+  3C24   push word ptr [0x34ad]                       |  130F   push word ptr [0x2ea]                       
+  3C28   lcall 0xb11, 0x1597                          |  1313   lcall 0x13c, 7                              
+  3C2D   add sp, 4                                    |  1318   add sp, 4                                   
+  3C30   cmp byte ptr [0x386d], 0                     |  131B   cmp byte ptr [0x2f6], 0                     
+  3C35   je 0x3c4a                                    |  1320   je 0x1335                                   
+  3C37   jmp 0x3c3e                                   |  1322   jmp 0x1329                                  
+  3C39   lcall 0, 0x18e4                              |  1324   lcall 0x13d, 0xb                            
+  3C3E   lcall 0, 0x1ae1                              |  1329   lcall 0x13d, 0xc                            
+  3C43   or ax, ax                                    |  132E   or ax, ax                                   
+  3C45   jne 0x3c39                                   |  1330   jne 0x1324                                  
+  3C47   jmp 0x3b75                                   |  1332   jmp 0x1260                                  
+  3C4A   nop                                          |  1335   nop                                         
+  3C4B   push cs                                      |  1336   push cs                                     
+  3C4C   call 0x7005                                  |  1337   call 0x1356                                 
+  3C4F   nop                                          |  133A   nop                                         
+  3C50   push cs                                      |  133B   push cs                                     
+  3C51   call 0x70fd                                  |  133C   call 0x1357                                 
+  3C54   jmp 0x3b75                                   |  133F   jmp 0x1260                                  
+                                                      |  1342   pop di                                      
+                                                      |  1343   pop si                                      
+                                                      |  1344   pop bp                                      
+                                                      |  1345   retf                                        
+
+  address correspondence (masked in the exact tier -- verify these):
+    insn 9    addr:?         -> addr:?
+    insn 12   addr:?         -> addr:?
+    insn 24   addr:?         -> addr:?
+    insn 32   call:?         -> call:?
+    insn 37   call:?         -> call:?
+    insn 40   call:?         -> call:?
+    insn 44   call:?         -> call:?
+    insn 52   call:?         -> call:?
+    insn 55   addr:?         -> addr:?
+    insn 55   addr:?         -> imm:8
+    insn 60   call:?         -> call:?
+    insn 64   addr:?         -> addr:?
+    insn 64   addr:?         -> imm:12
+    insn 71   addr:?         -> addr:?
+    insn 71   addr:?         -> imm:0
+    insn 75   addr:?         -> addr:?
+    insn 75   addr:?         -> imm:15
+    insn 79   addr:?         -> addr:?
+    insn 79   addr:?         -> imm:3
+    insn 83   call:?         -> call:?
+    insn 88   call:?         -> call:?
+    insn 97   addr:?         -> addr:?
+    insn 97   addr:?         -> imm:7
+    insn 102  addr:?         -> imm:11
+    insn 103  addr:?         -> imm:12
+    insn 109  call:?         -> call:?
+    insn 112  call:?         -> call:?

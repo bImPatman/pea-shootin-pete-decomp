@@ -1,0 +1,54 @@
+[
+ {
+  "hits": 0,
+  "flags": "-r"
+ },
+ {
+  "hits": 0,
+  "flags": "(defaults)"
+ },
+ {
+  "hits": 0,
+  "flags": "-O -r"
+ },
+ {
+  "hits": 0,
+  "flags": "-O"
+ },
+ {
+  "hits": 0,
+  "flags": "-O1 -r"
+ },
+ {
+  "hits": 0,
+  "flags": "-O1"
+ },
+ {
+  "hits": 0,
+  "flags": "-2 -r"
+ },
+ {
+  "hits": 0,
+  "flags": "-r -a"
+ },
+ {
+  "hits": 0,
+  "flags": "-r -k"
+ },
+ {
+  "hits": 0,
+  "flags": "-r -N"
+ },
+ {
+  "hits": 0,
+  "flags": "-r -Z"
+ },
+ {
+  "hits": 0,
+  "flags": "-r -d"
+ },
+ {
+  "hits": 0,
+  "flags": "-r -p"
+ }
+]
