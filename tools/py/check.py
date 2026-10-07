@@ -418,7 +418,7 @@ def cmd_list(db, markdown=False):
             print(text)
 
         # Regenerates the Progress section of README.md; keep the two in sync.
-        add_text("Progress: (" + str(len(rows)) + " / " + str(total) + ") attepted, exact match (" + str(n_exact) + " / " + str(total) + ")\n[" + str(int(percentage) * "█") + str((100 - int(percentage)) * "░") + "] " + str(round(percentage, 2)) + "%")
+        add_text("Progress: (" + str(len(rows)) + " / " + str(total) + ") attepted, exact match (" + str(n_exact) + " / " + str(total) + ")\n[" + str(int(percentage / 1.5) * "█") + str(((100 - int(percentage)) / 1.5) * "░") + "] " + str(round(percentage, 2)) + "%")
         add_text('| Metric | Count |')
         add_text('|---|---|')
         add_text('| Target functions | %d |' % total)
