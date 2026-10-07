@@ -15,7 +15,7 @@ Borland puts each module's code in its own <MODULE>_TEXT segment, so the
 functions this build produced are located unambiguously and cannot be confused
 with the C runtime that also lives in the link.
 """
-import os, re, sys, glob, json, subprocess
+import os, re, sys, glob, json, subprocess, re
 
 try:
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -35,7 +35,9 @@ SRC = os.path.join(ROOT, 'src')
 BUILD = os.path.join(ROOT, 'build')
 OUTDIR = os.path.join(ROOT, 'out')
 STATUS = os.path.join(OUTDIR, 'status.json')
-TARGET_DECL = re.compile(r'@target\s+([0-9a-fA-Fx]+|FUN_[0-9A-Fa-f_]+)', re.I)
+# FUN_ has to be tried first: `F` is in [0-9a-fA-F], so the hex branch would
+# otherwise match a bare "F" and truncate every FUN_* marker.
+TARGET_DECL = re.compile(r'@target\s+(FUN_[0-9A-Fa-f_]+|[0-9a-fA-Fx]+)', re.I)
 NAME_DECL = re.compile(r'@name\s+(\w+)')
 PROTO_DECL = re.compile(r'@proto\s+(.+?);?\s*$', re.M)
 NOMOD_DECL = re.compile(r'@module\s+none\b', re.I)
@@ -402,32 +404,57 @@ def status_rows(db, st):
 def cmd_list(db, markdown=False):
     st = load_status()
     total, n_shape, n_exact, rows = status_rows(db, st)
+    done = 0
+    max_func = 0
+    done_func = 0
+    for k, sh, ex, src, ts, ms, pct in rows:
+        done += pct
+    percentage = (100 / total) * (done / 100)
     if markdown:
+        replacement_text = ""
+        def add_text(text = ""):
+            nonlocal replacement_text
+            replacement_text = replacement_text + "\n" + text
+            print(text)
+
         # Regenerates the Progress section of README.md; keep the two in sync.
-        print('| Metric | Count |')
-        print('|---|---|')
-        print('| Target functions | %d |' % total)
-        print('| Verified shape | %d |' % n_shape)
-        print('| Verified exact | %d |' % n_exact)
-        print()
-        print('| Target | Shape | Exact | Source | Bytes |')
-        print('|---|---|---|---|---|')
-        for k, sh, ex, src, ts, ms, _ in rows:
-            print('| `%s` | %s | %s | `src/%s` | %d/%d |' % (k, sh, ex, src, ts, ms))
+        add_text("Progress: (" + str(len(rows)) + " / " + str(total) + ") attepted, exact match (" + str(n_exact) + " / " + str(total) + ")\n[" + str(int(percentage) * "█") + str((100 - int(percentage)) * "░") + "] " + str(round(percentage, 2)) + "%")
+        add_text('| Metric | Count |')
+        add_text('|---|---|')
+        add_text('| Target functions | %d |' % total)
+        add_text('| Verified shape | %d |' % n_shape)
+        add_text('| Verified exact | %d |' % n_exact)
+        add_text('| Attempted | ' + str(len(rows)) + " |")
+        add_text()
+        add_text('| Target | Exact % | Source | Bytes |')
+        add_text('|---|---|---|---|')
+        for k, sh, ex, src, ts, ms, pct in rows:
+            add_text('| `%s` | `%s` | `src/%s` | %d/%d |' % (k, pct, src, ts, ms))
+        
+        file = open("README.md", "r", encoding='utf-8')
+        out = file.read()
+        file.close()
+        pattern = rf"({re.escape("<!-- progress report start -->")}).*?({re.escape("<!-- progress report end -->")})"
+
+        updated_content = re.sub(
+            pattern, rf"\1\n{replacement_text}\n\2", out, flags=re.DOTALL
+        )
+
+        file = open("README.md", "w", encoding='utf-8')
+        file.write(updated_content)
+        file.close()
         return
     print('target functions : %d' % total)
     print('verified shape   : %d' % n_shape)
     print('verified exact   : %d' % n_exact)
     print('attempted        : %d' % len(rows))
-    done = 0
     if rows:
         hr('per-function status')
         print('  %-20s %-8s %-8s %-10s %s' % ('target', 'shape', 'exact', 'src', 'sizes'))
         for k, sh, ex, src, ts, ms, pct in rows:
-            done += pct
             print('  %-20s %-8s %-8s %-10s %d/%d  exact %5.1f%%'
                   % (k, sh, ex, src, ts, ms, pct))
-    print("" + str((100 / total) * (done / 100)) + "% Completed")
+    print("" + str(percentage) + "% Completed")
 
 
 def main(argv):

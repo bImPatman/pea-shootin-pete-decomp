@@ -432,11 +432,23 @@ and none of them are reconstructible as ordinary C.
      does not do,
   3. the constant-shift-through-CL blind spot,
   4. 32-bit stores putting the `dx` half at the lower offset (above).
-  All four point the same way: the game's optimiser allocates frames like 3.1's
-  `-O2` but merges epilogues like 3.1's `-O`/`-O1`, and folds `shl r/m8,imm8`
-  more aggressively.  The 3.1 runtime matched 76.6% of the load module, so the
-  *runtime* is 3.1; only the game modules disagree.  Worth checking a 3.0 or 3.2
-  archive if one becomes available.
+All four point the same way: the game's optimiser allocates frames like 3.1's
+   `-O2` but merges epilogues like 3.1's `-O`/`-O1`, and folds `shl r/m8,imm8`
+   more aggressively.  The 3.1 runtime matched 76.6% of the load module, so the
+   *runtime* is 3.1; only the game modules disagree.  Worth checking a 3.0 or 3.2
+   archive if one becomes available.
+* **Zext placed at the value's def, not at its use.** `FUN_13b2_2415`
+  (5F4D..5F55) wants the group
+  `mov ah,0 ; mov word [0x2c01],0 ; mov word [0x2bff],ax`, i.e. the char->int
+  extension of the *forwarded* `g_27f3` (still live in `al`) emitted *before* an
+  intervening literal-immediate store.  3.1 always emits the immediate store of
+  the preceding statement first, so every ordering/cast/comma/```&&``` shape
+  sweep (18 candidates under `cand/`) bottoms out at either
+  `imm ; ah0 ; a3` (`g_2c01 = 0; g_2bff = g_27f3;`) or
+  `ah0 ; a3 ; imm` (`g_2c01 = g_27f3; g_2bff = 0;`).  The game compiler hoists
+  the cheap extension to the register's def (right after the `a2 f3 27` store).
+  Adopted form in `src/m2415.c` is the former: byte-size exact (210/210) with a
+  matched instruction set, differing only in that one instruction's position.
 * **`-O` versus `-O1`.** Indistinguishable so far: on every probe tried they emit
   identical code.  `FUN_1000_10c1` matches at both.
 * **`-k`.** The target's frame-size distribution (`sub sp,N` with N = 2, 4, 6,

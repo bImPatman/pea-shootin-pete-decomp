@@ -1,0 +1,1 @@
+void FUN_0e25_06fe(char far *p, char far *lit) { }

@@ -57,6 +57,9 @@ SRC = os.path.join(ROOT, 'src')
 # an error message, so the split is deliberate.
 CORE = [
     os.path.join(SRC, 'main.c'),
+    # Owns every global shared between main() and mcallees.c.  Without it Turbo
+    # Link reports them undefined and then runs away emitting PETE.MAP.
+    os.path.join(SRC, 'g13b2.c'),
     os.path.join(SRC, 'mcallees.c'),
     os.path.join(SRC, 'run', 'stubs.c'),
     os.path.join(SRC, 'run', 'f44bstub.c'),

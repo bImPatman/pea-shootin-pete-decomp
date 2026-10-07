@@ -1,0 +1,1 @@
+unsigned char FUN_0e25_0978(char far *p, char far *lit) { return (unsigned char)p[0]; }

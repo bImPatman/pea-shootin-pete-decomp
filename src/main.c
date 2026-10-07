@@ -2,7 +2,7 @@
 /* @name   main */
 /* @proto  int main(int argc, char far *argv[], char far *envp[]) */
 /* @module none */
-/* @extra  mcallees.c xmod/xb11a.c xmod/xf44d.c xmod/xf44b.c xmod/xf44c.c xmod/xe256.c xmod/xb159.c keyread.c keypoll.c statebak.c clrbit3.c xmod/xnodefr.c xmod/xbuf2vg.c */
+/* @extra  g13b2.c mcallees.c xmod/xb11a.c xmod/xf44d.c xmod/xf44b.c xmod/xf44c.c xmod/xe256.c xmod/xb159.c keyread.c keypoll.c statebak.c clrbit3.c xmod/xnodefr.c xmod/xbuf2vg.c */
 
 /* Target 0x13B2F -- FUN_13b2_000f, the C entry point.
  *
@@ -87,13 +87,18 @@ void m_35dd(void);
 
 char g_cmd[80];            /* DS:0x8BC, compared against argv[1] */
 unsigned char g_2c60;     /* set from the strcmp result */
-unsigned char g_349e, g_349f;
-unsigned char g_27f3, g_27fc;
 unsigned char g_386d;
-char far *g_27aa;
-char far *g_34a9;
-char far *g_34ad;
-char far *g_3858;
+
+/* Globals shared with src/mcallees.c live in src/g13b2.c so there is exactly one
+   definition of each.  They used to be defined here, but Turbo Link 5.1 runs
+   away when a far call's module references a symbol no module defines, and
+   mcallees.c both calls far functions and reads these. */
+extern unsigned char g_349e, g_349f;
+extern unsigned char g_27f3, g_27fc;
+extern char far *g_27aa;
+extern char far *g_34a9;
+extern char far *g_34ad;
+extern char far *g_3858;
 
 int main(int argc, char far *argv[], char far *envp[])
 {

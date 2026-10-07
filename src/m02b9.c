@@ -2,6 +2,7 @@
 /* @name   m_02b9 */
 /* @proto  void __far m_02b9(void) */
 /* @module same */
+/* @extra  xmod/xfba.c g13b2.c */
 
 /* FUN_13b2_02b9, 39 bytes / 12 instructions.  Called by m_013b at 0x3DD9 once
    g_2bf5 wraps past 0xFF, and by FUN_13b2_2c80 at 0x681B unconditionally.

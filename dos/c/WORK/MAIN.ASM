@@ -15,7 +15,7 @@ $comm	macro	name,dist,size,count
 	endif
 	?debug	V 300h
 	?debug	S "main.c"
-	?debug	C E9AE90455D066D61696E2E63
+	?debug	C E96A9B455D066D61696E2E63
 	?debug	C E94019CA1813443A5C494E434C5544455C737472696E672E68
 	?debug	C E94019CA1812443A5C494E434C5544455C5F646566732E68
 	?debug	C E94019CA1812443A5C494E434C5544455C5F6E756C6C2E68
@@ -258,23 +258,7 @@ _main	proc	far
 _main	endp
 MAIN_TEXT	ends
 _BSS	segment word public 'BSS'
-_g_3858	label	dword
-	db	4 dup (?)
-_g_34ad	label	dword
-	db	4 dup (?)
-_g_34a9	label	dword
-	db	4 dup (?)
-_g_27aa	label	dword
-	db	4 dup (?)
 _g_386d	label	byte
-	db	1 dup (?)
-_g_27fc	label	byte
-	db	1 dup (?)
-_g_27f3	label	byte
-	db	1 dup (?)
-_g_349f	label	byte
-	db	1 dup (?)
-_g_349e	label	byte
 	db	1 dup (?)
 _g_2c60	label	byte
 	db	1 dup (?)
@@ -291,15 +275,15 @@ MAIN_TEXT	ends
 	extrn	__setenvp__:far
 	extrn	__setargv__:far
 	public	_main
-	public	_g_3858
-	public	_g_34ad
-	public	_g_34a9
-	public	_g_27aa
+	extrn	_g_3858:dword
+	extrn	_g_34ad:dword
+	extrn	_g_34a9:dword
+	extrn	_g_27aa:dword
+	extrn	_g_27fc:byte
+	extrn	_g_27f3:byte
+	extrn	_g_349f:byte
+	extrn	_g_349e:byte
 	public	_g_386d
-	public	_g_27fc
-	public	_g_27f3
-	public	_g_349f
-	public	_g_349e
 	public	_g_2c60
 	public	_g_cmd
 	extrn	_m_35dd:far

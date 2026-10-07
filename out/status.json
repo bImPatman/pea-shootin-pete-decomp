@@ -87,6 +87,39 @@
   "target_name": "FUN_13b2_000f",
   "target_size": 300
  },
+ "FUN_13b2_0252": {
+  "exact": true,
+  "exact_pct": 100.0,
+  "mine_name": "_M_0252",
+  "mine_size": 103,
+  "shape": true,
+  "shape_pct": 100.0,
+  "source": "src\\m0252.c",
+  "target_name": "FUN_13b2_0252",
+  "target_size": 103
+ },
+ "FUN_13b2_02b9": {
+  "exact": true,
+  "exact_pct": 100.0,
+  "mine_name": "_M_02B9",
+  "mine_size": 39,
+  "shape": true,
+  "shape_pct": 100.0,
+  "source": "src\\m02b9.c",
+  "target_name": "FUN_13b2_02b9",
+  "target_size": 39
+ },
+ "FUN_13b2_3153": {
+  "exact": true,
+  "exact_pct": 100.0,
+  "mine_name": "_M_3153",
+  "mine_size": 100,
+  "shape": true,
+  "shape_pct": 100.0,
+  "source": "src\\m3153.c",
+  "target_name": "FUN_13b2_3153",
+  "target_size": 100
+ },
  "FUN_18a2_0154": {
   "exact": true,
   "exact_pct": 100.0,

@@ -152,7 +152,39 @@ class NInsn:
 
 
 def normalise(func, img_size):
-    return [NInsn(i, func.start, img_size) for i in func.insns]
+    insns = [NInsn(i, func.start, img_size) for i in func.insns]
+    _mask_ds_literals(insns)
+    return insns
+
+
+def _mask_ds_literals(insns):
+    """Treat `push ds; push N` as an address pair, not a literal.
+
+    Borland emits a `char far *` whose segment is the data segment as
+    `push ds` followed by `push <offset of the literal>`.  PETE.EXE has a large
+    data segment, so those offsets are all in the 0x8xx..0x19xx range and look
+    like addresses; a rebuild of the same function from stubs puts the literal
+    near the start of its own DGROUP, where the value falls under SMALL_LIT and
+    `norm_operand` would classify it as a literal whose exact value then has to
+    match.  The two sides can therefore never agree even when the code is
+    identical, which is the same problem the far control transfer above solves.
+
+    The pattern is unambiguous -- `push ds` only ever appears as the segment half
+    of a far pointer here -- so the offset is reclassified `addr:?`, which both
+    tiers mask.  Real numeric literals are unaffected because they are not
+    preceded by `push ds`.
+    """
+    for i, n in enumerate(insns):
+        if i == 0 or n.mnem.lower() != 'push' or len(n.ops) != 1:
+            continue
+        prev = insns[i - 1]
+        if prev.mnem.lower() != 'push' or len(prev.ops) != 1:
+            continue
+        if prev.ops[0].text != 'ds':
+            continue
+        if n.ops[0].kind != 'imm':
+            continue
+        n.ops[0] = Tok('addr', 'addr:?', n.ops[0].value)
 
 
 def addr_fields(n):
