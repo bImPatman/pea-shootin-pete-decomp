@@ -12,7 +12,12 @@ extern char far *g_34a1;
 extern unsigned char g_2800, g_27f2, g_27f6, g_2c61, g_27ed, g_27f9, g_27fa, g_27fc, g_27f3;
 
 struct bfi65 { unsigned char pad[0x65]; unsigned int : 2; unsigned int b2 : 1; };
-struct dispatch_entry { void (far *fn)(void); unsigned char pad[0x30]; };
+struct dispatch_entry {
+    char far *p_73a, *p_73e, *p_742, *p_746, *p_74a;
+    void (far *fn)(void);
+    char far *sub[6];
+    unsigned char pad[4];
+};
 extern struct dispatch_entry g_dispatch[];
 
 unsigned char FUN_0e25_0978(char far *p, char far *lit);

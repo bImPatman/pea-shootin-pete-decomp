@@ -79,8 +79,9 @@ char far *g_3858;
     storage here or TLINK runs away on the undefined reference. */
 unsigned int  g_168c;          /* +0x168C: set to 0xBB80, a 48000-hertz-ish divisor */
 unsigned int  g_2c01, g_2bff;  /* +0x2C01 / +0x2BFF: cleared, then tested by m_013b */
-/* +0x27AE..+0x27B1: one far pointer, offset word at 0x27AE and segment word at
-    0x27B0.  FUN_1b11_1106 returns it in DX:AX and m_2415 stores DX first. */
+/* +0x27AE..+0x27B1: one far pointer, segment word at 0x27AE and offset word at
+    0x27B0.  FUN_1b11_1106 returns it in DX:AX (segment, offset) and m_2415
+    stores DX (segment) at the low word. */
 char far *g_27ae;
 unsigned char g_2bf0, g_27ee, g_27f0, g_27f1, g_27f4;
 unsigned char g_27f7;
@@ -90,6 +91,13 @@ unsigned char g_27fe;
    by m_2c80.  m_2c80 sets g_27f3 when g_2805 is nonzero. */
 unsigned char g_27e6, g_27e7, g_27ef, g_27fb, g_2803, g_2805;
 unsigned char g_2804, g_2807;
+
+/* +0x27E2/+0x27E4: copied by m_24e7 from the dispatch row's sub[g_27ec]; the
+   else-branch then draws from it.  +0x27F5/+0x27F8: m_24e7 derives g_27f8 from
+   the second object byte.  +0x2801/+0x2802: cleared by m_24e7. */
+char far *g_27e2;
+unsigned char g_27f5, g_27f8;
+unsigned char g_2801, g_2802;
 
 /* +0x1690 / +0x18F8: m_1df6 clears one, sets the other; m_2c80 branches on g_18f8
    and spins on g_18fa. */
@@ -109,11 +117,80 @@ unsigned int g_2bfb, g_2bfd;
    the virtual-call tables those functions dispatch through. */
 char far *g_34a1;
 
-/* The DS:0x74E dispatch table that m_013b indexes with g_27ed (stride 0x34):
-   each entry is a far function pointer followed by 0x30 bytes of payload, so
-   `g_dispatch[g_27ed].fn()` compiles to `imul dx,0x34; lcall [bx+disp]`. */
-struct dispatch_entry { void (far *fn)(void); unsigned char pad[0x30]; };
-struct dispatch_entry g_dispatch[8];
+/* The DS:0x73E dispatch table that m_013b indexes with g_27ed (stride 0x34).
+    The row really starts at DS:0x73A with five far payload pointers, then the
+    far function pointer at +0x14 (0x74E), then a far-pointer array `sub[6]` at
+    +0x18 (0x752) that m_24e7 strcmps between, then 4 pad bytes.  fn() compiles
+    to `imul dx,0x34; lcall [bx+disp]`, and a variable `sub[i]` indexes stride 4
+    from +0x752.
+ *
+    The seventh slot matters.  m_24e7 reads sub[g_27ec] with the counter running
+    0..7, and 6 falls past the six declared entries onto the four bytes the
+    decompiler recorded as `pad` -- so those four bytes are really one more far
+    pointer, and the struct is spelled `sub[7]` here to say so.  mcallees.c and
+    src/m24e7.c keep the sub[6]+pad[4] spelling, which lays out identically, so
+    their verified bytes do not move.
+ */
+struct dispatch_entry {
+    char far *p_73a;        /* +0x00 */
+    char far *p_73e;        /* +0x04 */
+    char far *p_742;        /* +0x08 */
+    char far *p_746;        /* +0x0c */
+    char far *p_74a;        /* +0x10 */
+    void (far *fn)(void);   /* +0x14 */
+    char far *sub[7];       /* +0x18 */
+};
+
+struct obj742 {
+    char far *f0, *f4, *f8, *fc, *f10, *f14;   /* +0x00 */
+    unsigned char pad[0x1a];                    /* +0x18 */
+    void (far *fn32)(void);                     /* +0x32 */
+};
+struct obj_e2 {
+    unsigned char b0f[0xf];                     /* +0x00 */
+    char far *f0f;                              /* +0x0f */
+    char far *f13;                              /* +0x13 */
+    unsigned char b17;                          /* +0x17 */
+    void (far *fn18)(void);                     /* +0x18 */
+};
+
+/* Nothing reconstructed writes this table yet: the target fills DS:0x73A from
+   FUN_13b2_38a2, which is still an empty stand-in, so the table arrives as
+   zeroes.  m_013b's `lcall [bx+0x74E]` and m_24e7's `->fn18()` both dereference
+   it unconditionally on the first frame, and a null segment lands in the
+   interrupt vector table.  The rows below are the smallest shape those two call
+   sites accept: readable strings for the strlen/strcpy sources, one obj742 for
+   the g_27ec%7 branch, seven obj_e2 for sub[0..6], and a no-op behind every far
+   code pointer.  They are stand-ins for data, not a reconstruction of it.
+ */
+static void dispatch_nop(void) { }
+
+static char d_title[]  = "Scene 00";
+static char d_name[]   = "Sub 00";
+static char d_key[]    = "k";
+static char d_caption[] = "Cap";
+static char d_blank[]  = "";
+static char d_text[]   = "........";
+
+static struct obj742 d_obj742 = {
+    d_text, d_text, d_text, d_text, d_text, d_text, {0}, dispatch_nop
+};
+static struct obj_e2 d_e2[7] = {
+    { {0}, d_text, d_blank, 0, dispatch_nop },
+    { {0}, d_text, d_blank, 0, dispatch_nop },
+    { {0}, d_text, d_blank, 0, dispatch_nop },
+    { {0}, d_text, d_blank, 0, dispatch_nop },
+    { {0}, d_text, d_blank, 0, dispatch_nop },
+    { {0}, d_text, d_blank, 0, dispatch_nop },
+    { {0}, d_text, d_blank, 0, dispatch_nop }
+};
+
+#define D_ROW { d_title, d_name, &d_obj742, d_key, d_caption, dispatch_nop, \
+                { &d_e2[0], &d_e2[1], &d_e2[2], &d_e2[3], &d_e2[4], \
+                  &d_e2[5], &d_e2[6] } }
+struct dispatch_entry g_dispatch[8] = {
+    D_ROW, D_ROW, D_ROW, D_ROW, D_ROW, D_ROW, D_ROW, D_ROW
+};
 
 /* +0x2C33: 7-byte scratch copy area; +0x2C56: string scratch.  m_24e7 and m_2c80
    fill these and pass them by address to FUN_1000_28ef / FUN_1b11_034c. */

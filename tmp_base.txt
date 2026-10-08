@@ -1,0 +1,284 @@
+﻿cleaned 56 stale file(s) from WORK
+  link src\main.c
+  link src\g13b2.c
+  link src\mcallees.c
+  link src\run\stubs.c
+  link src\run\f44bstub.c
+  link src\keypoll.c
+  link src\keyread.c
+  link src\statebak.c
+  link src\clrbit3.c
+  link src\mb159.c
+  link src\dacupd.c
+  link src\dacwrite.c
+  link src\nodefree.c
+  link src\xmod\xd19dc.c
+  link src\e256.c
+  link src\xmod\xe161d.c
+  link src\buftovg.c
+  link src\xmod\xb2vcb.c
+
+flags -ml -1 -O2 -r-   model -ml
+rc 3489660927   ok False
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+main.c:
+Warning main.c 151: Parameter 'argc' is never used in function main
+Warning main.c 151: Parameter 'envp' is never used in function main
+
+
+	Available memory 4156568
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+main.c:
+Warning main.c 151: Parameter 'argc' is never used in function main
+Warning main.c 151: Parameter 'envp' is never used in function main
+
+
+	Available memory 4157320
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+g13b2.c:
+
+
+	Available memory 4194836
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+g13b2.c:
+
+
+	Available memory 4194836
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+mcallees.c:
+Warning mcallees.c 80: Suspicious pointer conversion in function m_1a40
+Warning mcallees.c 88: Code has no effect in function m_24e7
+Warning mcallees.c 90: Code has no effect in function m_154f
+
+
+	Available memory 4183244
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+mcallees.c:
+Warning mcallees.c 80: Suspicious pointer conversion in function m_1a40
+Warning mcallees.c 88: Code has no effect in function m_24e7
+Warning mcallees.c 90: Code has no effect in function m_154f
+
+
+	Available memory 4185020
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+stubs.c:
+Warning stubs.c 120: Parameter 'p' is never used in function m_b11a
+Warning stubs.c 128: Parameter 'p' is never used in function m_f44d
+
+
+	Available memory 4163964
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+stubs.c:
+Warning stubs.c 120: Parameter 'p' is never used in function m_b11a
+Warning stubs.c 128: Parameter 'p' is never used in function m_f44d
+
+
+	Available memory 4166252
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+f44bstub.c:
+Warning f44bstub.c 25: Parameter 'p' is never used in function m_f44b
+Warning f44bstub.c 25: Parameter 'v' is never used in function m_f44b
+
+
+	Available memory 4188260
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+f44bstub.c:
+Warning f44bstub.c 25: Parameter 'p' is never used in function m_f44b
+Warning f44bstub.c 25: Parameter 'v' is never used in function m_f44b
+
+
+	Available memory 4190036
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+keypoll.c:
+
+
+	Available memory 4190392
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+keypoll.c:
+
+
+	Available memory 4192424
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+keyread.c:
+
+
+	Available memory 4190392
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+keyread.c:
+
+
+	Available memory 4192168
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+statebak.c:
+
+
+	Available memory 4188260
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+statebak.c:
+
+
+	Available memory 4189524
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+clrbit3.c:
+
+
+	Available memory 4189524
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+clrbit3.c:
+
+
+	Available memory 4190800
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+mb159.c:
+Warning mb159.c 39: Function should return a value in function m_b159
+
+
+	Available memory 4188516
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+mb159.c:
+Warning mb159.c 39: Function should return a value in function m_b159
+
+
+	Available memory 4190292
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+dacupd.c:
+
+
+	Available memory 4188768
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+dacupd.c:
+
+
+	Available memory 4190800
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+dacwrite.c:
+
+
+	Available memory 4194788
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+dacwrite.c:
+
+
+	Available memory 4196328
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+nodefree.c:
+
+
+	Available memory 4188516
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+nodefree.c:
+
+
+	Available memory 4189780
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xd19dc.c:
+Warning xd19dc.c 3: Parameter 'p' is never used in function m_d19_dc
+Warning xd19dc.c 3: Parameter 'kind' is never used in function m_d19_dc
+
+
+	Available memory 4196668
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xd19dc.c:
+Warning xd19dc.c 3: Parameter 'p' is never used in function m_d19_dc
+Warning xd19dc.c 3: Parameter 'kind' is never used in function m_d19_dc
+
+
+	Available memory 4197944
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+e256.c:
+Warning e256.c 68: Suspicious pointer conversion in function m_e256
+Warning e256.c 71: Suspicious pointer conversion in function m_e256
+Warning e256.c 74: Nonportable pointer comparison in function m_e256
+Warning e256.c 79: Suspicious pointer conversion in function m_e256
+Warning e256.c 95: Code has no effect in function FUN_1e25_105b
+Warning e256.c 96: Code has no effect in function FUN_1e25_0dde
+
+
+	Available memory 4180836
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+e256.c:
+Warning e256.c 68: Suspicious pointer conversion in function m_e256
+Warning e256.c 71: Suspicious pointer conversion in function m_e256
+Warning e256.c 74: Nonportable pointer comparison in function m_e256
+Warning e256.c 79: Suspicious pointer conversion in function m_e256
+Warning e256.c 95: Code has no effect in function FUN_1e25_105b
+Warning e256.c 96: Code has no effect in function FUN_1e25_0dde
+
+
+	Available memory 4179284
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xe161d.c:
+
+
+	Available memory 4190880
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xe161d.c:
+
+
+	Available memory 4192676
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+buftovg.c:
+Warning buftovg.c 67: Code has no effect in function FUN_1e25_043e
+Warning buftovg.c 95: Code has no effect in function FUN_1e25_0d95
+
+
+	Available memory 4184420
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+buftovg.c:
+Warning buftovg.c 67: Code has no effect in function FUN_1e25_043e
+Warning buftovg.c 95: Code has no effect in function FUN_1e25_0d95
+
+
+	Available memory 4184660
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xb2vcb.c:
+
+
+	Available memory 4198024
+
+Borland C++  Version 3.1 Copyright (c) 1992 Borland International
+xb2vcb.c:
+
+
+	Available memory 4199300
+
+
+LINK RUNAWAY: Turbo Link emitted PETE.MAP (10495.7 MB) -- almost always a duplicate symbol such as a second main().
+
+build failed: no PETE.EXE was produced
+

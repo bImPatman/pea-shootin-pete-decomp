@@ -96,9 +96,10 @@ void stub_boot(void)
     emit("[stub] main() has 18 callees; 13 are reconstructed and linked");
     emit("[stub]   real: key_poll key_read statebak clrbit3 m_1a40");
     emit("[stub]         m_b159 m_f44c m_e256 node_free buf_to_vga");
+    emit("[stub]   real in src/mcallees.c:");
+    emit("[stub]     m_1df6 m_24e7 m_013b m_2c80");
     emit("[stub]   inert no-ops in src/mcallees.c, not yet reconstructed:");
-    emit("[stub]     m_1df6 m_38a2 m_2415 m_24e7 m_0dd6 m_154f");
-    emit("[stub]     m_013b m_34e5 m_35dd");
+    emit("[stub]     m_38a2 m_2415 m_0dd6 m_154f m_34e5 m_35dd");
     emit("[stub] next gap reached will be reported below");
 }
 

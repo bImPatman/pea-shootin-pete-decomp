@@ -1,11 +1,19 @@
 """Run the linked PETE.EXE under DOSBox and show what it printed.
 
-The game does not exit on its own: main() is an unconditional `for(;;)` whose
-exit condition is g_27fc, and nothing reconstructed yet sets it.  So a run is
-expected to be killed by the timeout, and that is reported as information
-rather than treated as a crash.  Output captured before the kill is still
-printed, which is the whole point of this script -- the logging stand-ins in
-src/run/stubs.c name the first unresolved callee the game reaches.
+main() is an unconditional `for(;;)` whose frame loop is left only when g_27fc
+is set, and even then the program does not return to DOS -- it falls into
+`tail:` and spins.  So a run is always killed by the timeout, and that is
+reported as information rather than treated as a crash.
+
+Whether the frame loop was actually left is answered by the log rather than by
+the exit status: src/mcallees.c's m_34e5 is reachable only from `tail:`, so it
+emits a single `[boot]` line when it first runs, and that is the signal that
+m_1df6 -> m_24e7 -> m_013b -> m_2c80 drove g_27fc high.  A timeout without that
+line still means what it always did: g_27fc was never set.
+
+Output captured before the kill is still printed, which is the whole point of
+this script -- the logging stand-ins in src/run/stubs.c name the first
+unresolved callee the game reaches.
 
 A timeout, a non-zero DOSBox exit and a game that logged nothing are all
 reported and still exit 0: a program this incomplete is expected to misbehave,
@@ -94,9 +102,12 @@ def main():
 
     rc, log = dosbox.run_batch('RUN.BAT', timeout=args.timeout)
 
+    guest = ''
     if os.path.exists(GUEST_LOG):
-        print(open(GUEST_LOG, encoding='latin1', errors='replace')
-              .read().replace('\r', '').rstrip())
+        guest = open(GUEST_LOG, encoding='latin1', errors='replace').read()
+
+    if guest:
+        print(guest.replace('\r', '').rstrip())
     else:
         print('the game logged nothing at all')
         if 'GAME_START' not in log:
@@ -106,7 +117,15 @@ def main():
             print(log.replace('\r\n', '\n').rstrip())
     print('-' * 60)
 
+    # `[boot]` is written by m_34e5, which only `tail:` reaches, and `tail:` is
+    # only reached once g_27fc (or g_27f3, latched from it) is set.
+    booted = '[boot]' in guest
+
     if rc == 124:
+        if booted:
+            print('g_27fc was set and main() left the frame loop; the program '
+                  'then spins in its own for(;;), so the timeout is expected')
+            return 0
         print('still running when the timeout expired; killed (this is the '
               'expected outcome while g_27fc is never set)')
         return 1 if args.strict else 0

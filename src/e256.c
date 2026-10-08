@@ -41,7 +41,8 @@ struct e256 {
    the *same* two globals buf_to_vga flushes; Borland's large model puts every
    .c file in its own data segment, so src/buftovg.c renames its copies to
    g_cur_a / g_cur_b to keep both modules linkable. */
-unsigned char g_18f8, g_18f9;
+extern unsigned char g_18f8;   /* owned by src/g13b2.c (shared with m_1df6/m_2c80) */
+unsigned char g_18f9;
 char far *g_cur;
 
 /* cross module: FUN_161d_08de */
