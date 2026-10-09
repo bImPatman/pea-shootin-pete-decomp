@@ -345,7 +345,7 @@ def cmd_diff(db, key, srcpath, verbose=True):
 
 
 def cmd_all(db):
-    files = sorted(glob.glob(os.path.join(SRC, '*.c')))
+    files = sorted(glob.glob(os.path.join(SRC, "**", "*.c"), recursive=True))
     st = load_status()
     hr('BATCH RUN  (%d source files)' % len(files))
     print('  %-24s %-22s %-7s %-7s %s' % ('source', 'target', 'shape', 'exact', 'note'))
@@ -418,7 +418,7 @@ def cmd_list(db, markdown=False):
             print(text)
 
         # Regenerates the Progress section of README.md; keep the two in sync.
-        add_text("Progress: (" + str(len(rows)) + " / " + str(total) + ") attepted, exact match (" + str(n_exact) + " / " + str(total) + ")\n[" + (int(percentage / 1.5) * "█") + (int((100 - percentage) / 1.5) * "░") + "] " + str(round(percentage, 2)) + "%")
+        add_text("Progress: (" + str(len(rows)) + " / " + str(total) + ") attepted, exact match (" + str(n_exact) + " / " + str(total) + ")\n[" + (int(percentage / 1.5) * "█") + (int((100 - percentage) / 1.5) * "░") + "] " + str(round(percentage, 2)) + "% exact match")
         add_text('| Metric | Count |')
         add_text('|---|---|')
         add_text('| Target functions | %d |' % total)

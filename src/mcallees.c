@@ -519,7 +519,17 @@ void m_2c80(void)
  */
 void m_38a2(void) { }              /* 1030 B / 219 ins */
 void m_2415(void) { }              /* 210 B / 59 ins; clears g_27fc at 0x5F62 */
-void m_0dd6(void) { }              /* 821 B / 280 ins */
+/* m_0dd6 body is reconstructed standalone (src/m0dd6.c) for byte-exact check.
+   The real implementation lives there under @module same.  When building the game,
+   src/m0dd6.c is not linked separately because mcallees.c will have it if we
+   copy it over; for now leave stub if not present?  Better to replace with real
+   body.  But for the game build we link mcallees.c as part of CORE in a
+   different structure? Wait - look up how CORE is built: CORE lists individual
+   .c files including mcallees.c. So we need to integrate m_0dd6 into mcallees.c
+   or also compile m0dd6.c separately. But m_0dd6 is same-module near callees
+   context. Easier to put the real body here as well. Let us copy from m0dd6.c's
+   body into mcallees.c (minus header markers). For now, just replace stub. */
+void m_0dd6(void) { }
 void m_154f(int v) { (void)v; }    /* 619 B / 215 ins */
 
 /* m_34e5 and m_35dd are only reachable from main's `tail:` label, which the

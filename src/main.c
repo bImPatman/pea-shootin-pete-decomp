@@ -86,7 +86,6 @@ void m_34e5(void);
 void m_35dd(void);
 
 char g_cmd[80];            /* DS:0x8BC, compared against argv[1] */
-unsigned char g_386d;
 
 /* Globals shared with src/mcallees.c live in src/g13b2.c so there is exactly one
    definition of each.  They used to be defined here, but Turbo Link 5.1 runs
@@ -95,6 +94,7 @@ unsigned char g_386d;
 extern unsigned char g_349e, g_349f;
 extern unsigned char g_27f3, g_27fc;
 extern unsigned char g_2c60;
+extern unsigned char g_386d;
 extern char far *g_27aa;
 extern char far *g_34a9;
 extern char far *g_34ad;
