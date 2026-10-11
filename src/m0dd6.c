@@ -2,7 +2,7 @@
 /* @name   m_0dd6 */
 /* @proto  void m_0dd6(void) */
 /* @module same */
-/* @extra  g13b2.c xmod/x0adb1.c xmod/x0adb224.c xmod/x0adb2bc.c xmod/x0adb1ff.c xmod/x0adb324.c xmod/x11ae1.c xmod/x118e4.c xmod/xb11009a.c xmod/xb1100b5.c xmod/xb1134c.c xmod/xb11462.c xmod/x1f4429e.c xmod/xe250a23.c xmod/xe250a89.c xmod/xe2503a4.c xmod/xe25b0f.c xmod/x161d38e.c xmod/x163c7.c xmod/x163e4.c xmod/x163a9.c */
+/* @extra  g13b2.c xmod/x0adb1.c xmod/x0adb224.c xmod/x0adb2bc.c xmod/x0adb1ff.c xmod/x0adb324.c xmod/x11ae1.c xmod/x118e4.c xmod/xb11009a.c xmod/xb1100b5.c xmod/xb1134c.c xmod/xb11462.c xmod/x1f4429e.c xmod/x1e25a23.c xmod/x1e25a89.c xmod/x1e253a4.c xmod/x1e25b0.c xmod/x161d38e.c xmod/x163c7.c xmod/x163e4.c xmod/x163a9.c */
 
 /* Target 0x48F6..0x4C29 (820 bytes / 218 insns): the "small frame" update
    m_0dd6 runs once a frame while g_2c60 == 1.  The interesting part is the
@@ -118,11 +118,12 @@ void m_0dd6(void)
 
     if (g_388b) {
         FUN_1e25_03a4(g_27aa);
-        if (g_18f8)
+        if (g_18f8) {
             FUN_1b11_034c(0x64, 0x50, "<< Sound On >>", 0x10, 0x1f, 1, 0x63);
-        else
+        } else {
             FUN_1b11_034c(0x64, 0x50, ">> Sound Off <<", 0x10, 0x1f, 1, 0x63);
-        FUN_1e25_0b0f(g_27aa);
+            FUN_1e25_0b0f(g_27aa);
+        }
         FUN_1b11_00b5(0x3c, 0);
         FUN_1b11_0462(0x64, 0x50, ">> Sound Off <<");
     }
@@ -164,14 +165,14 @@ input:
         g_27ea = 1;
     }
 
-    if (FUN_161d_03a9(1) == 0) {
-        g_27eb = 1;
+    if (FUN_161d_03a9(1)) {
+        if (g_27eb == 0)
+            goto end;
+        g_27eb = 0;
+        FUN_13b2_110b();
         return;
     }
-    if (g_27eb == 0)
-        goto end;
-    g_27eb = 0;
-    FUN_13b2_110b();
+    g_27eb = 1;
     return;
 
 stage2:

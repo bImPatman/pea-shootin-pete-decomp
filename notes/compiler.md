@@ -431,8 +431,10 @@ and none of them are reconstructible as ordinary C.
   2. epilogue merging in frameless multi-return functions, which 3.1's `-O2`
      does not do,
   3. the constant-shift-through-CL blind spot,
-  4. 32-bit stores putting the `dx` half at the lower offset (above).
-All four point the same way: the game's optimiser allocates frames like 3.1's
+  4. 32-bit stores putting the `dx` half at the lower offset (above),
+  5. adjacent duplicate epilogues, which `-O2` coalesces and the target keeps
+     (`FUN_13b2_34e5`, above).
+All five point the same way: the game's optimiser allocates frames like 3.1's
    `-O2` but merges epilogues like 3.1's `-O`/`-O1`, and folds `shl r/m8,imm8`
    more aggressively.  The 3.1 runtime matched 76.6% of the load module, so the
    *runtime* is 3.1; only the game modules disagree.  Worth checking a 3.0 or 3.2
@@ -520,6 +522,45 @@ so a faithful rebuild looks a few bytes too long.  `repairholes.py` hands those
 bytes back when the gap is exactly `pop di / pop si / pop bp / retf`, the
 preceding instruction is a near `jmp`, and the next function starts immediately
 after.  Only `FUN_13b2_000f` qualified.
+
+## Adjacent duplicate epilogues: the seventh divergence
+
+`FUN_13b2_34e5` (flat 0x7005..0x70FD, 248 bytes, 97 instructions) matches
+93/97 instructions and every byte of its body, but the target ends with two
+*identical* epilogues back to back:
+
+```
+70F5  pop di
+70F6  pop si
+70F7  leave
+70F8  retf
+70F9  pop di
+70FA  pop si
+70FB  leave
+70FC  retf
+```
+
+The first is the fall-through epilogue for the `if (p) { ... }` block's non-zero
+arm; the second is the shared exit for the two early `return`s and the block's
+zero arm.  A sweep of the whole image shows this is the *only* function in all
+454 with a `retf`/`ret` immediately followed by another epilogue - everywhere
+else (settag's `FUN_1f44_04c4`, or the four-epilogue `FUN_13b2_0dd6`) at least
+one instruction separates two epilogues.
+
+BCC 3.1 `-O2` folds adjacent identical epilogues into one, so every source shape
+tried reproduces only the 244-byte image: bare `if (c) return;` guards, an
+explicit trailing `return;`, a `return;` inside the final `if`, a
+`goto end;` / `end: return;` pair, and inline-return-plus-trailing-return all
+merge the two epilogues.  Six shapes, one result, and `0x17005 + 244 == 0x170F9`
+is exactly where the second epilogue begins.
+
+`0x70F9` is genuinely part of the function - the guards jump to it at 0x7014 and
+0x7030, and the block's zero arm branches to it at 0x70D5 - so the four bytes are
+not an orphan or a Ghidra artefact.  This is the same *kind* of disagreement as
+the `enter`/`sub sp` split and the frameless-epilogue merging above: the game's
+optimiser does not coalesce duplicate epilogues.  Adopted form in `src/m34e5.c`
+is the 244-byte, 93/97-shape body; it is linked into `src/mcallees.c` with the
+guards' stand-ins returning zero so it stays inert at run time.
 ## Global data addresses are masked, so do not chase them
 
 `diffasm.norm_operand` classifies a memory displacement by magnitude.  Anything

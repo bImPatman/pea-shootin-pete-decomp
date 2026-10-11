@@ -14,12 +14,13 @@
  * Within this file the calls stay same-module, so the rel16 form is what the
  * target uses.
  *
- * Four of these are real now: m_1a40, m_1df6, m_24e7, m_013b and m_2c80.  They
- * were reconstructed one function at a time against PETE.EXE with
+ * Real now: m_1a40, m_1df6, m_24e7, m_013b, m_2c80, m_0dd6, m_34e5 and m_b11a.
+ * They were reconstructed one function at a time against PETE.EXE with
  * `check.py diff` (each still has its own standalone `src/<name>.c` used for
  * byte-exact verification); this file is the linked-together copy the game
  * actually runs.  m_013b calls m_2c80, and m_2c80 is the only writer of g_27fc,
- * so together they are what lets main()'s frame loop terminate.
+ * so together they are what lets main()'s frame loop terminate.  m_38a2,
+ * m_2415, m_154f and m_35dd are still stubs at the bottom of this file.
  */
 
 /* m_1a40's own far callees */
@@ -47,7 +48,8 @@ extern unsigned char g_27fc, g_27f3, g_27fd, g_27ff, g_2800;
 extern unsigned char g_27ec, g_27ed, g_27f2, g_27f6, g_27f9, g_27fa;
 extern unsigned char g_2c61, g_2c60;
 extern unsigned int  g_2bf5;
-extern unsigned int  g_19e4;
+extern unsigned int  g_19e4[];
+extern unsigned int  g_19e8;
 extern unsigned int  g_2bfb, g_2bfd;
 extern unsigned char g_2805, g_27f7, g_349f, g_349e;
 extern unsigned char g_27f5, g_27f8, g_2801, g_2802;
@@ -55,6 +57,12 @@ extern unsigned char g_27e6, g_27e7, g_27ef, g_27fb, g_2803;
 extern unsigned char g_2804, g_2807;
 extern unsigned char g_27ee;
 extern unsigned char g_1690, g_18f8, g_18fa;
+/* m_0dd6's input/stage state machine. */
+extern unsigned char g_27ea, g_27eb, g_34a0, g_7d6;
+extern unsigned char g_386d, g_386e, g_386f, g_3870, g_3871, g_3872, g_3873;
+extern unsigned char g_3874, g_3875, g_3876, g_3877;
+extern unsigned char g_3889, g_388b, g_388c, g_3898, g_389a;
+extern unsigned char g_38a4, g_38a5, g_38b4, g_38b7, g_38b9, g_38bc;
 extern unsigned char g_2c33[7];
 extern unsigned char g_2c56[0x20];
 
@@ -120,8 +128,8 @@ void FUN_0e25_06fe(char far *p, char far *lit);
 void FUN_0e25_0b0f(char far *p);
 int  FUN_0f92_0006(int a, int b);
 void FUN_0f92_0084(void);
-int  FUN_0ffe_000e(int a, int b, int c, int d, int e, int f, char far *g,
-                   int h, int i);
+int  FUN_0ffe_000e();       /* 10 stack words; m_24e7 spells arg 7 as a far
+                               pointer, m_b11a as two ints -- same pushed bytes */
 void FUN_1000_0ef8(void);
 int  FUN_1000_2c09_2(char far *a, char far *b);
 int  FUN_1000_2c09_1(char far *a);
@@ -160,6 +168,48 @@ int  FUN_1f44_04a2(char far *p);
 int  FUN_1f44_03f1(char far *p);
 void FUN_1f44_04b3(char far *p);
 
+/* m_0dd6's far callees (the body was integrated from src/m0dd6.c). */
+unsigned char FUN_0adb_0001(unsigned char v);
+unsigned char FUN_0adb_0224(unsigned char v);
+void FUN_0adb_02bc(void);
+int  FUN_1000_1ae1(void);
+void FUN_1000_18e4(void);
+void FUN_1b11_009a(void);
+void FUN_1e25_03a4(char far *p);
+void FUN_1e25_0a23(char far *p);
+void FUN_1e25_0a89(char far *p);
+int  FUN_161d_03c7(void);
+int  FUN_161d_03e4(void);
+int  FUN_161d_03a9(int v);
+
+/* m_34e5's far callees. */
+unsigned char FUN_1df0_0222(unsigned long v);
+void          FUN_1df0_0181(unsigned char a, unsigned long b, char far *s,
+                            unsigned char c);
+char far     *FUN_1b11_0c4d(char far *p, char far *s, int n);
+void          FUN_1b11_079e(char far *p, int flag);
+
+/* m_b11a's far callees.  The two OROS-style draw helpers take a far pointer as
+   one parameter (two pushed words); the prototype spelling is only the caller's
+   view, the stack words are what matter. */
+void FUN_1fd3_0012(int, int, int, int, int, int, char far *, int, int);
+void FUN_1fc2_0006(int, int, int, int, int, int, char far *, int, int, int);
+void FUN_1d19_068d(char far *p);
+void FUN_1d19_073e(char far *p);
+
+/* m_154f / FUN_13b2_17ba's far helpers and shared HUD-number state. */
+void FUN_1000_2937(unsigned long v, char far *buf, int base);
+struct g207 {
+    int far *p;                 /* +0x00 */
+    char     pad[0x0c];         /* +0x04 */
+    int      w10;               /* +0x10 */
+    int      w12;               /* +0x12 */
+};
+extern struct g207 far *g_2c07[];
+extern unsigned long    g_num_cur, g_num_prev;
+extern unsigned char    g_27e8, g_27e9;
+void FUN_13b2_17ba(unsigned char v);
+
 /* The four reconstructed bodies, in call order. */
 void m_1df6(void);
 void m_24e7(char a);
@@ -171,9 +221,10 @@ void m_1a40(void);
 void m_38a2(void);
 void m_2415(void);
 void m_0dd6(void);
-void m_154f(int v);
+void m_154f(unsigned char v);
 void m_34e5(void);
 void m_35dd(void);
+int  m_b11a(char far *p);       /* reconstructed below */
 
 /* Same-module callees of the four reconstructed bodies, still stubs. */
 void m_07f7(void);
@@ -193,6 +244,9 @@ void FUN_13b2_1a40(void);
 void FUN_13b2_3153(int v);
 void FUN_13b2_31b7(void);
 void FUN_13b2_1a81(void);
+void FUN_13b2_1393(int v);
+void FUN_13b2_11ac(void);
+void FUN_13b2_110b(void);
 
 /* ----------------------------------------------------------------- bodies --
  */
@@ -512,6 +566,110 @@ void m_2c80(void)
     }
 }
 
+/* FUN_1b11_1a94, 813 B / 261 ins.  Byte-exact in src/mb11a.c (shape+exact
+ * 261/261); this is the linked copy.  main() calls it once per frame with
+ * g_34a9.  The list head is a one byte count at +0 followed by four byte far
+ * pointers; the object flags at +0x65/+0x66 are read through an int-based
+ * bitfield overlay (BCC emits `shr ax,N / and ax,1 / or ax,ax` for those) and
+ * written as plain bytes.  See src/mb11a.c for the full layout notes. */
+struct mobj {
+    char            pad0[0x13];                 /* +0x00 */
+    int             w13;                        /* +0x13 */
+    int             w15;                        /* +0x15 */
+    int             w17;                        /* +0x17 */
+    int             w19;                        /* +0x19 */
+    int             w1b;                        /* +0x1b */
+    int             w1d;                        /* +0x1d */
+    int             w1f;                        /* +0x1f */
+    int             w21;                        /* +0x21 */
+    char            pad1[0x0a];                 /* +0x23 */
+    unsigned char   b2d;                        /* +0x2d */
+    char            pad2[2];                    /* +0x2e */
+    unsigned char   b30;                        /* +0x30 */
+    char            pad3[0x20];                 /* +0x31 */
+    void       (far *fn51)(char far *);         /* +0x51 */
+    char            pad4[0x10];                 /* +0x55 */
+    unsigned char   b65;                        /* +0x65 */
+    unsigned char   b66;                        /* +0x66 */
+    char far * far *p67;                        /* +0x67 */
+    char            pad5[8];                    /* +0x6b */
+    char far * far *p73;                        /* +0x73 */
+};
+
+struct mbits {
+    char            pad[0x65];                  /* +0x00 */
+    unsigned        x0 : 5;                     /* +0x65 bits 0..4 */
+    unsigned        b5 : 1;                     /* +0x65 bit 5 */
+    unsigned        b6 : 1;                     /* +0x65 bit 6 */
+    unsigned        x7 : 1;                     /* +0x65 bit 7 */
+    unsigned        y0 : 5;                     /* +0x66 bits 0..4 */
+    unsigned        c5 : 1;                     /* +0x66 bit 5 */
+    unsigned        c6 : 1;                     /* +0x66 bit 6 */
+    unsigned        y7 : 1;                     /* +0x66 bit 7 */
+};
+
+#define MB(o) ((struct mbits far *)(o))
+
+struct mlist {
+    unsigned char       n;                      /* +0x00 */
+    char                pad;                    /* +0x01 */
+    struct mobj far    *item[1];                /* +0x02 */
+};
+
+void FUN_1b11_1ed3(char far *p, char far *o);
+
+int m_b11a(char far *pp)
+{
+    struct mlist far *p = (struct mlist far *)pp;
+    int i;
+    int a, b, d, c;
+
+    for (i = 0; i < p->n; i++) {
+        if (p->item[i]->fn51 && !MB(p->item[i])->b5)
+            p->item[i]->fn51((char far *)p->item[i]);
+        if (!MB(p->item[i])->c6) {
+            a = p->item[i]->w13 >> 1;
+            b = p->item[i]->w15 >> 1;
+            c = p->item[i]->w19 >> 1;
+            d = p->item[i]->w17 >> 1;
+            FUN_0ffe_000e(a, b, a + c, b + d, a, b,
+                          g_19e8, g_19e4[g_349f], 0x140, 0x140);
+        }
+        if (!MB(p->item[i])->c5)
+            FUN_1d19_073e((char far *)p->item[i]);
+        FUN_1d19_068d((char far *)p->item[i]);
+    }
+
+    for (i = 0; i < p->n; i++) {
+        if (MB(p->item[i])->b5) {
+            if (MB(p->item[i])->b6)
+                FUN_1b11_1ed3((char far *)p, (char far *)p->item[i]);
+            else
+                p->item[i]->b65 |= 0x40;
+        }
+    }
+
+    for (i = 0; i < p->n; i++) {
+        if (!MB(p->item[i])->b5) {
+            if (p->item[i]->b30) {
+                FUN_1fd3_0012(0, 0, p->item[i]->w21, p->item[i]->w1f,
+                              p->item[i]->w1b, p->item[i]->w1d,
+                              p->item[i]->p73[p->item[i]->b2d],
+                              g_19e4[g_349f], 0x140);
+            } else {
+                FUN_1fc2_0006(0, 0, p->item[i]->w21, p->item[i]->w1f,
+                              p->item[i]->w1b, p->item[i]->w1d,
+                              *((char far * far *)p->item[i]->p67[p->item[i]->b2d]),
+                              g_19e4[g_349f], 0x140, 0x140);
+            }
+        }
+    }
+}
+
+/* FUN_1b11_1ed3, 337 B.  Not reconstructed; reached only when an object has
+   both flags at +0x65 set, which the zeroed run record never does. */
+void FUN_1b11_1ed3(char far *p, char far *o) { (void)p; (void)o; }
+
 /* ----------------------------------------------------------------- stubs ---
  * Same-module helpers that are not yet reconstructed.  In the linked build they
  * are genuine no-ops; the byte-exact versions live in their own src/*.c and are
@@ -519,31 +677,295 @@ void m_2c80(void)
  */
 void m_38a2(void) { }              /* 1030 B / 219 ins */
 void m_2415(void) { }              /* 210 B / 59 ins; clears g_27fc at 0x5F62 */
-/* m_0dd6 body is reconstructed standalone (src/m0dd6.c) for byte-exact check.
-   The real implementation lives there under @module same.  When building the game,
-   src/m0dd6.c is not linked separately because mcallees.c will have it if we
-   copy it over; for now leave stub if not present?  Better to replace with real
-   body.  But for the game build we link mcallees.c as part of CORE in a
-   different structure? Wait - look up how CORE is built: CORE lists individual
-   .c files including mcallees.c. So we need to integrate m_0dd6 into mcallees.c
-   or also compile m0dd6.c separately. But m_0dd6 is same-module near callees
-   context. Easier to put the real body here as well. Let us copy from m0dd6.c's
-   body into mcallees.c (minus header markers). For now, just replace stub. */
-void m_0dd6(void) { }
-void m_154f(int v) { (void)v; }    /* 619 B / 215 ins */
+/* FUN_13b2_0dd6, 821 B / 280 ins.  Byte-exact in src/m0dd6.c (shape+exact
+ * 280/280); this is the linked copy.  Its same-module callees are below. */
+void m_0dd6(void)
+{
+    int loc1;
+    int loc2;
+
+    FUN_0adb_0001(g_27ec);
+
+    if (g_2805 && FUN_1000_1ae1())
+        g_27f3++;
+
+    if (g_386d) {
+        if (!g_27f3) {
+            FUN_13b2_1a40();
+            g_27f3++;
+        }
+    }
+
+    if (g_2c60 == 1) {
+        if (g_386e)
+            FUN_1b11_00b5(0x14, 0);
+        if (g_386f)
+            FUN_1b11_00b5(0x3c, 0);
+        if (g_3898)
+            g_27f9 = 1;
+        if (g_389a) {
+        if (g_18fa)
+            FUN_1e25_0a23(g_27aa);
+        else
+            FUN_1e25_0a89(g_27aa);
+            FUN_1000_18e4();
+            FUN_1b11_009a();
+            FUN_1b11_00b5(0x1e, 0);
+        }
+        if (g_3870) {
+            FUN_1f44_029e(g_3858, 2);
+            FUN_1000_18e4();
+        }
+        if (g_3871) {
+            FUN_1f44_029e(g_3858, 3);
+            FUN_1000_18e4();
+        }
+        if (g_3872)
+            g_27f2 = 1;
+        if (g_3873)
+            g_27f2 = 0;
+        if (g_3874)
+            FUN_0adb_0224(g_27ec);
+        if (g_3875)
+            FUN_0adb_01ff();
+        if (g_3876)
+            FUN_0adb_02bc();
+        if (g_3877)
+            FUN_0adb_0324();
+        if (g_388c) {
+            if (!g_34a0)
+                g_34a0++;
+        }
+    }
+
+    if (g_388b) {
+        FUN_1e25_03a4(g_27aa);
+        if (g_18f8) {
+            FUN_1b11_034c(0x64, 0x50, "<< Sound On >>", 0x10, 0x1f, 1, 0x63);
+        } else {
+            FUN_1b11_034c(0x64, 0x50, ">> Sound Off <<", 0x10, 0x1f, 1, 0x63);
+            FUN_1e25_0b0f(g_27aa);
+        }
+        FUN_1b11_00b5(0x3c, 0);
+        FUN_1b11_0462(0x64, 0x50, ">> Sound Off <<");
+    }
+
+    if (g_2800 == 0)
+        goto end;
+    if (g_7d6 == 0)
+        goto stage2;
+    if (!g_2805)
+        goto input;
+    goto stage2;
+
+input:
+    asm {
+        cli
+    }
+    FUN_161d_038e();
+    loc1 = FUN_161d_03c7();
+    loc2 = FUN_161d_03e4();
+    asm {
+        sti
+    }
+
+    if (loc1 <= 0x1d)
+        FUN_13b2_1393(1);
+    else if (loc1 >= 0x63)
+        FUN_13b2_1393(2);
+    else if (loc2 >= 0x54)
+        FUN_13b2_1393(4);
+    else
+        FUN_13b2_1393(5);
+
+    if (FUN_161d_03a9(0)) {
+        if (g_27ea) {
+            g_27ea = 0;
+            FUN_13b2_11ac();
+        }
+    } else {
+        g_27ea = 1;
+    }
+
+    if (FUN_161d_03a9(1)) {
+        if (g_27eb == 0)
+            goto end;
+        g_27eb = 0;
+        FUN_13b2_110b();
+        return;
+    }
+    g_27eb = 1;
+    return;
+
+stage2:
+    if (g_38b7)
+        FUN_13b2_1393(1);
+    else if (g_38b9)
+        FUN_13b2_1393(2);
+    else if (g_38bc)
+        FUN_13b2_1393(4);
+    else
+        FUN_13b2_1393(5);
+
+    if (g_38a4 == 0 && g_3889 == 0 && g_38b4 == 0)
+        goto l_then;
+    if (g_27eb) {
+        g_27eb = 0;
+        FUN_13b2_110b();
+    }
+    goto l_after;
+l_then:
+    g_27eb = 1;
+l_after:
+    if (g_38a5) {
+        if (g_27ea) {
+            g_27ea = 0;
+            FUN_13b2_11ac();
+            return;
+        }
+        return;
+    }
+    g_27ea = 1;
+    return;
+
+end:
+    return;
+}
+/* FUN_13b2_154f, 619 B / 215 ins.  Byte-exact in src/m154f.c (shape+exact
+ * 215/215).  The HUD number-draw: formats the score (FUN_1000_2937), then
+ * blits a background band and one 8px glyph per digit via FUN_0ffe_000e, then
+ * tail-calls FUN_13b2_17ba through the same-module rel16 form. */
+void m_154f(unsigned char v)
+{
+    unsigned char i, n, c, c2;
+    int y;
+
+    if (g_27e8++ < 0x32 && g_27e9 != 0 && !v)
+        return;
+    if (g_2c61)
+        g_num_cur = 0;
+
+    FUN_1000_2937(g_num_cur, (char far *)g_2c33, 0xa);
+    n = strlen(g_2c33) - 1;
+    y = 0xae;
+    FUN_0ffe_000e(0xae - (n * 9 + 9), 0xa5, 0xae, 0xb0, 0xae - (n * 9 + 9), 0xa5,
+                  g_19e8, g_19e4[g_349f], 0x140, 0x140);
+    for (i = 0; i <= n; i++) {
+        c = g_2c33[n - i];
+        c2 = c + 0xd0;
+        y -= 8;
+        FUN_0ffe_000e(0, 0, g_2c07[c2]->w10, g_2c07[c2]->w12, y, 0xa5,
+                      g_2c07[c2]->p[1], g_19e4[g_349f], 8, 0x140);
+    }
+
+    if (g_27e8 >= 0x32)
+        g_27e9 = 0;
+    else
+        g_27e9 = 1;
+    g_27e8 = 0;
+
+    if (v != 0) {
+        FUN_0ffe_000e(0xae - (n * 9 + 9), 0xa5, 0xae, 0xb0,
+                      0xae - (n * 9 + 9), 0xa5,
+                      g_19e8, g_19e4[g_349f ^ 1], 0x140, 0x140);
+        y = 0xae;
+        for (i = 0; i <= n; i++) {
+            c = g_2c33[n - i];
+            c2 = c + 0xd0;
+            y -= 8;
+            FUN_0ffe_000e(0, 0, g_2c07[c2]->w10, g_2c07[c2]->w12, y, 0xa5,
+                          g_2c07[c2]->p[1], g_19e4[g_349f ^ 1], 8, 0x140);
+        }
+        g_27e9 = 1;
+    }
+
+    if (g_num_cur < g_num_prev && v == 0)
+        return;
+    if (g_num_cur >= g_num_prev)
+        g_num_prev = g_num_cur;
+
+    FUN_13b2_17ba(v);
+}
+
+/* FUN_13b2_17ba, 467 B / 167 ins.  Byte-exact in src/m17ba.c.  Same-module
+ * forward reference from m_154f, hence it is defined here after the caller.
+ * It is m_154f's draw with the other field-parity bit and the score-parity
+ * constants 0xb4/0xbf in place of 0xa5/0xb0. */
+void FUN_13b2_17ba(unsigned char v)
+{
+    unsigned char i, n, c, c2;
+    int y;
+
+    FUN_1000_2937(g_num_prev, (char far *)g_2c33, 0xa);
+    n = strlen(g_2c33) - 1;
+    y = 0xae;
+    FUN_0ffe_000e(0xae - (n * 9 + 9), 0xb4, 0xae, 0xbf, 0xae - (n * 9 + 9), 0xb4,
+                  g_19e8, g_19e4[g_349f], 0x140, 0x140);
+    for (i = 0; i <= n; i++) {
+        c = g_2c33[n - i];
+        c2 = c + 0xd0;
+        y -= 8;
+        FUN_0ffe_000e(0, 0, g_2c07[c2]->w10, g_2c07[c2]->w12, y, 0xb4,
+                      g_2c07[c2]->p[1], g_19e4[g_349f], 8, 0x140);
+    }
+    if (v == 0)
+        return;
+    FUN_0ffe_000e(0xae - (n * 9 + 9), 0xb4, 0xae, 0xbf, 0xae - (n * 9 + 9), 0xb4,
+                  g_19e8, g_19e4[g_349f ^ 1], 0x140, 0x140);
+    y = 0xae;
+    for (i = 0; i <= n; i++) {
+        c = g_2c33[n - i];
+        c2 = c + 0xd0;
+        y -= 8;
+        FUN_0ffe_000e(0, 0, g_2c07[c2]->w10, g_2c07[c2]->w12, y, 0xb4,
+                      g_2c07[c2]->p[1], g_19e4[g_349f ^ 1], 8, 0x140);
+    }
+}
 
 /* m_34e5 and m_35dd are only reachable from main's `tail:` label, which the
    frame loop falls out of exactly when g_27fc (or g_27f3, set from g_27fc) is
    set.  main() itself never returns -- it is an unconditional `for(;;)` -- so
    this is the one place the log can report that the frame loop was left, and
    run_game.py's timeout can therefore not be mistaken for a boot that never
-   happened.  Reporting it once keeps the line from repeating every spin. */
+   happened.  Reporting it once keeps the line from repeating every spin.
+
+   The body below is FUN_13b2_34e5, reconstructed as src/m34e5.c to 244 of the
+   target's 248 bytes (93/97 instructions).  The four missing bytes are a
+   redundant adjacent duplicate epilogue that BCC 3.1 -O2 coalesces; see the
+   "Adjacent duplicate epilogues" section in notes/compiler.md.  It is inert
+   here because FUN_1df0_0222's stand-in returns 0, so the second guard returns
+   before any of the calls that would touch a real pointer. */
 void emit(char *line);
+
+char far *FUN_13b2_4ecf(char far *p)
+{
+    return p;
+}
 
 void m_34e5(void)
 {
     static int logged;
+    int v;
+    char far *p;
+
     if (!logged) { logged = 1; emit("[boot] frame loop exited; g_27fc is set"); }
+
+    if (g_2805 == 1)
+        return;
+
+    if ((v = FUN_1df0_0222(g_2bfimer)) == 0)
+        return;
+
+    FUN_1f44_029e(g_3858, 0);
+    FUN_1f44_0276(g_3858, 0, 0);
+    FUN_1f44_03f1(g_3858);
+    p = FUN_13b2_4ecf(0);
+    strcpy(g_2c33, FUN_1b11_0c4d(p, "sb_green.l", 8));
+    FUN_1df0_0181(v, g_2bfimer, g_2c33, g_27fc);
+    if (p) {
+        FUN_1b11_079e(p, 0);
+        FUN_1000_02bf(p);
+    }
 }
 void m_35dd(void) { }              /* 709 B / 273 ins */
 
@@ -559,10 +981,13 @@ void m_1393(int a) { (void)a; }
 void m_2f97(void) { }
 void m_3153(int a) { (void)a; }
 
-void FUN_13b2_154f(int v) { (void)v; }
+void FUN_13b2_154f(int v) { m_154f((unsigned char)v); }  /* alias of m_154f */
 void FUN_13b2_0e2f(void) { }
 void FUN_13b2_1347(void) { }
 void FUN_13b2_1a40(void) { }
+void FUN_13b2_1393(int v) { (void)v; }
+void FUN_13b2_11ac(void) { }
+void FUN_13b2_110b(void) { }
 void FUN_13b2_3153(int v) { (void)v; }
 void FUN_13b2_31b7(void) { }
 void FUN_13b2_1a81(void) { }

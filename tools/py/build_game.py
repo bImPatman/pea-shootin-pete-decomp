@@ -151,6 +151,26 @@ CORE = [
     os.path.join(SRC, 'xmod', 'xf4400fe.c'),
     os.path.join(SRC, 'xmod', 'xf4404a2.c'),
     os.path.join(SRC, 'xmod', 'xf4403f1.c'),
+    # m_34e5's far callees (the body now lives in mcallees.c).
+    os.path.join(SRC, 'xmod', 'x0df222.c'),
+    os.path.join(SRC, 'xmod', 'x0df181.c'),
+    os.path.join(SRC, 'xmod', 'xb110c4d.c'),
+    os.path.join(SRC, 'xmod', 'xb11079e.c'),
+    # m_0dd6's far callees that the four bodies above do not already supply
+    # (x1e25b0.c for FUN_1e25_0b0f is linked earlier for m_2c80).
+    os.path.join(SRC, 'xmod', 'x1e253a4.c'),
+    os.path.join(SRC, 'xmod', 'x1e25a23.c'),
+    os.path.join(SRC, 'xmod', 'x1e25a89.c'),
+    # m_b11a's far callees (the body now lives in mcallees.c).
+    os.path.join(SRC, 'xmod', 'xfd3.c'),
+    os.path.join(SRC, 'xmod', 'xfc2006.c'),
+    os.path.join(SRC, 'xmod', 'xd1968d.c'),
+    os.path.join(SRC, 'xmod', 'xd1973e.c'),
+    # m_154f / FUN_13b2_17ba's RTL number->ASCII helper (the HUD score).  It
+    # must be linked, not just declared: TLINK still writes the .EXE when this
+    # symbol is undefined, so the build looked clean while the HUD number-draw
+    # called a null target.
+    os.path.join(SRC, 'xmod', 'x1002937.c'),
 ]
 
 # Opt-in reconstructions that touch hardware when they run.  m_f44b writes VGA

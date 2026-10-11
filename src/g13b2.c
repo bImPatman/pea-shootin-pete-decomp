@@ -289,6 +289,11 @@ unsigned char g_2c56[0x20];
 /* +0x19E6/+0x19E8: far pointer consumed by the 10-arg FUN_1ffe_000e from 2c80/24e7. */
 char far *g_19e6;
 
+/* +0x19E8: read as a bare word by m_b11a's FUN_0ffe_000e call site.  In the
+   original image it is the segment half of g_19e6; here it is its own symbol
+   because diffasm masks the absolute DS address anyway. */
+unsigned int g_19e8;
+
 /* m_0dd6's input/stage state machine.  Input (~=keyboard/joystick) processing
    latches g_27ea / g_27eb; stage two checks g_38a5 / g_38b7 / g_38b9 / g_38bc
    to pick an action and whether to drop into the same latch logic. */
@@ -318,4 +323,20 @@ unsigned char g_38b4;     /* +0x38B4: m_0dd6 stage-2 condition, all-zero branch 
 unsigned char g_38b7;     /* +0x38B7 */
 unsigned char g_38b9;     /* +0x38B9 */
 unsigned char g_38bc;     /* +0x38BC */
+
+/* m_154f / FUN_13b2_17ba (the HUD number-draw twosome).  Types only again:
+   the absolute DS refs are masked by diffasm.  g_2c07 is the per-glyph sprite
+   table indexed by (char + 0xd0); each entry is a far pointer to a record whose
+   far pointer is at +0 and whose source-x / width words are at +0x10 / +0x12. */
+struct g207 {
+    int far *p;                 /* +0x00 */
+    char     pad[0x0c];         /* +0x04 */
+    int      w10;               /* +0x10 */
+    int      w12;               /* +0x12 */
+};
+struct g207 far *g_2c07[1];
+unsigned long    g_num_cur;      /* +0x2BFF: value being shown this frame */
+unsigned long    g_num_prev;     /* +0x2C03: last value actually drawn */
+unsigned char    g_27e8;         /* +0x27E8: redraw-countdown tick */
+unsigned char    g_27e9;         /* +0x27E9: redraw latch */
 

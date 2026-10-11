@@ -40,13 +40,12 @@
    computes di = segment(g_3550) + [bp+8] and walks backwards from there, i.e.
    it slides the palette bytes in [rec[+4], rec[+6]) down to rec[+4].
  */
-struct node {
+struct node_f44d {
     unsigned char pad0[2];
     unsigned char a, b;
     unsigned int w4, w6;
 };
-
-struct node g_3850;
+struct node_f44d g_3850;
 unsigned char g_3550[0x300];
 unsigned char g_3853;         /* byte 3 of the 0x3850 record, counted down */
 
@@ -58,14 +57,11 @@ void m_f44d(char far *p)
     /* `x` pads the frame out to the ten bytes the target reserves, and `q` is
        kept in a stack slot rather than folded into an immediate segment:offset
        pair: the target reloads it with `les` and then addresses es:[bx+n]. */
-    struct { struct node far *q; char x[6]; } v;
+    struct { struct node_f44d far *q; char x[6]; } v;
 
-    if (p[2]) {
-        if (--g_3853 == 0) {
-            v.q = &g_3850;
-            v.q->b = v.q->a;
-            pal_shift(v.q->w4, v.q->w6, g_3550);
-            return;
-        }
-    }
+    if (p[2] == 0 || g_3853-- != 0)
+        return;
+    v.q = &g_3850;
+    v.q->b = v.q->a;
+    pal_shift(v.q->w4, v.q->w6, g_3550);
 }

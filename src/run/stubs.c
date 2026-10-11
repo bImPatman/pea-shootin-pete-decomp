@@ -12,10 +12,10 @@
  *
  *  - The eight *cross-module* callees live in their own files precisely so they
  *    can be replaced wholesale.  This file is that replacement for a run build,
- *    but only for the two that are still missing outright: m_b11a and m_f44d.
- *    Each stand-in reports itself once and returns a harmless zero, so the game
- *    keeps going instead of stopping at the first gap.  The rest are linked from
- *    their own reconstructions.
+ *    but only for the one that is still missing outright: m_f44d.  Its stand-in
+ *    reports itself once and returns a harmless zero, so the game keeps going
+ *    instead of stopping at the first gap.  The rest are linked from their own
+ *    reconstructions.
  *
  *  - m_f44b's stand-in is *not* here, but in f44bstub.c next door.  That one is
  *    a genuine reconstruction (src/f44b.c) held back only because it writes VGA
@@ -93,13 +93,13 @@ void stub_boot(void)
        --with-partial too, and that build swaps in the exact m_f44b, so its real
        list is one longer and it prints no m_f44b gap line -- that difference is
        the whole way to tell the two builds apart from the log alone. */
-    emit("[stub] main() has 18 callees; 13 are reconstructed and linked");
+    emit("[stub] main() has 18 callees; 16 are reconstructed and linked");
     emit("[stub]   real: key_poll key_read statebak clrbit3 m_1a40");
     emit("[stub]         m_b159 m_f44c m_e256 node_free buf_to_vga");
     emit("[stub]   real in src/mcallees.c:");
-    emit("[stub]     m_1df6 m_24e7 m_013b m_2c80");
+    emit("[stub]     m_1df6 m_24e7 m_013b m_2c80 m_0dd6 m_b11a m_154f");
     emit("[stub]   inert no-ops in src/mcallees.c, not yet reconstructed:");
-    emit("[stub]     m_38a2 m_2415 m_0dd6 m_154f m_34e5 m_35dd");
+    emit("[stub]     m_38a2 m_2415 m_34e5 m_35dd");
     emit("[stub] next gap reached will be reported below");
 }
 
@@ -110,14 +110,6 @@ void note(char *name, char *target)
     sprintf(line, "[stub] %-11s -> %-16s not reconstructed, ignored",
             name, target);
     emit(line);
-}
-
-int m_b11a(char far *p)
-{
-    static int logged;
-    stub_boot();
-    if (!logged) { logged = 1; note("m_b11a", "FUN_1b11_1a94"); }
-    return 0;
 }
 
 int m_f44d(char far *p)

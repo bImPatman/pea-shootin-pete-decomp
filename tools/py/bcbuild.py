@@ -204,7 +204,11 @@ def build(sources, name="prog", cfg=None, exe_dir=None, want_asm=True,
 
     rc, log = dosbox.run_batch('B.BAT', timeout=timeout)
 
-    res = {"rc": rc, "log": log, "ok": 'BUILD_OK' in log,
+    # TLINK still writes the .EXE when a symbol is undefined, so the batch's
+    # `if not exist ...EXE` probe succeeds and BUILD_OK is printed even though
+    # the link was bad.  A BCC/TLINK "Error:"/"Fatal:" line is the real signal.
+    failed = re.search(r'(?m)^\s*(?:Error|Fatal)\b', log) is not None
+    res = {"rc": rc, "log": log, "ok": ('BUILD_OK' in log) and not failed,
            "name": name, "flags": bcc_flags(cfg), "model": cfg["model"]}
     _guard_runaway(res)
     if res["ok"]:
