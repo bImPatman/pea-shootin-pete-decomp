@@ -79,6 +79,41 @@ near and still emits `ret`.
 * `C0L.OBJ` is the large-model startup object (`C0T` warns "No stack").
 * A module containing `double` maths makes Turbo Link die before printing its
   banner.  PETE.EXE contains no real FPU code, so this has not been pursued.
+* **`push 0` becomes `push ax` when 3.1 can prove `AX == 0`.**  The inline
+  `strcat`/`strcpy` idioms end in `xor ax,ax` (the `repne scasb` scan), so a
+  constant `0` argument in the *next* statement is folded to `push ax`, e.g.
+  `strcat(buf,"z"); f(a,b,c,d,e,g,0);`.  Declaring that parameter `char` makes
+  3.1 emit `push 0` again (probe-verified); an `int` parameter gets `push ax`.
+  `m_35dd` needs the `char` spelling for its last two `FUN_1b11_034c` arguments,
+  and `FUN_0df0_025f`'s first parameter is likewise `char` (so `mov al,[bp-N]`).
+* **A shared return epilogue means the source used `||`, not `&&`.**  When a
+  function is `if (p == 0) p = alloc();` and then returns `p` on the
+  allocation-failure path, the target can fold both exits into one epilogue:
+  `or ax,dx ; je Lend` (jump *on* malloc failure to a single trailing
+  `mov dx,[bp+8]; mov ax,[bp+6]; leave; retf`).  3.1 only emits that shape for
+  the short-circuit `||` spelling
+
+  ```c
+  if (p != 0 || (p = FUN_1000_0778(N)) != 0) { ...body... }
+  return p;
+  ```
+
+  The `&&` form `if (p == 0 && (p = FUN_1000_0778(N)) == 0) return p;` emits
+  `or ax,dx ; jne Lbody` with an *inline* return instead, and the naive
+  `if (p == 0) { p = FUN_1000_0778(N); if (p == 0) return p; }` also
+  **reloads the far pointer from memory** (`or ax,[bp+8]`) and emits two
+  epilogues.  Probe-verified against `pr_ret.c` / `pr2.c` (variants A-K) /
+  `pr3.c`; a `goto Lend` variant and an empty-then/else variant also match, but
+  `||` is what the original almost certainly wrote.  `m_f4406` (`FUN_1f44_0006`)
+  and `m_e2500a` (`FUN_1e25_000a`) both use this shape -- the second one has a
+  body over 127 bytes, so its `||` fall-through is the long
+  `jne <near> ; jmp <rel16> END` form while the allocation failure stays a
+  short `je`.
+* **Chained assignment reuses a single constant load.**  `p[3] = p[2] = p[0] = 0`
+  emits one `mov al,0` followed by the stores in right-to-left order, whereas
+  three separate `= 0;` statements each emit an immediate store.  `m_e2500a`'s
+  two adjacent byte clears come from `p[0x109] = p[0x108] = 0;` (store 0x108
+  first because it is the innermost assignment).
 
 ## Which flags actually do anything
 
@@ -561,6 +596,35 @@ the `enter`/`sub sp` split and the frameless-epilogue merging above: the game's
 optimiser does not coalesce duplicate epilogues.  Adopted form in `src/m34e5.c`
 is the 244-byte, 93/97-shape body; it is linked into `src/mcallees.c` with the
 guards' stand-ins returning zero so it stays inert at run time.
+
+## 8-bit `±1` is always `dec`/`inc` for 3.1: the eighth divergence
+
+`FUN_13b2_38a2` (flat 0x73C2..0x77C8, 1030 bytes, 316 instructions) reconstructs
+to the target's exact size and matches every instruction through index 239, where
+a single 8-bit constant add disagrees:
+
+```
+76D8  mov al, byte ptr [bp - 2]
+76DB  add al, 0xff
+mine: dec al
+```
+
+The source is `FUN_1f44_035c(g_3858, k, k - 1, 2)`. BCC 3.1 folds every 8-bit
+`±1` rvalue to `dec`/`inc` - `k - 1`, `k + 0xff`, `k + 255`, `k + 0xffU`,
+`k + 255U`, `k + 0377`, `k + (unsigned char)0xff`, `k + (char)255`,
+`k + (1 << 8) - 1`, `k + 0x80 + 0x7f`, `(char)(k - 1)`, `(unsigned char)(k - 1)`,
+`k - 1 + 0` and `0 + k - 1`, as `int`/`char`/`unsigned char` and both as a
+parameter and as a local all produce `dec al`.  `-Od` folds it too, so this is in
+the backend rather than the optimiser and no flag set reaches `add al, 0xff`; the
+game's compiler (Turbo C++ 1.x, per the 1991 banner) simply left the add
+unfolded.  A *pre*-decrement `!--g.b` does emit `add al, 0xff`, but it stores the
+decremented value back and so is not available to a plain rvalue.
+
+This is the same *kind* of disagreement as the CL-shift and 32-bit-store cases:
+the opcode differs while the bytes and semantics are identical (both are 2-byte
+8-bit adds of 0xff).  Adopted form in `src\m38a2.c` is `k + 0xff`; the function is
+linked into `src\mcallees.c` and this is its one non-exact instruction.
+
 ## Global data addresses are masked, so do not chase them
 
 `diffasm.norm_operand` classifies a memory displacement by magnitude.  Anything
@@ -601,33 +665,64 @@ section above.  The fix is to make one module the owner and have the other say
 `extern`, with `@extra` pointing back at the owner so each file still builds
 standalone for `check.py`.
 
-## Borland folds `&global` but still stores it
+## A bare pointer local is not folded like a struct member
 
-`FUN_1f44_01de` is the one function in this batch that resists.  Everything up to
-the countdown gate matches, but the target keeps the far pointer in a local:
+`FUN_1f44_01de` (flat 0xF61E..0xF6B6, 152 bytes, 50 instructions) resisted for a
+long time because three of its quirks mask one another.  It keeps the far pointer
+in a local and reloads it whole:
 
     mov word ptr [bp - 8], ds
     mov word ptr [bp - 0xa], 0x3850
     les bx, ptr [bp - 0xa]
     mov al, byte ptr es:[bx + 2]
+    mov byte ptr es:[bx + 3], al
 
-while `&g_node` is a link-time constant, so Borland emits the two stores as dead
-code and then folds the uses into `mov es, [bp - 8]` plus a direct `es:[0x5c8]`.
-Declaring the local pointer `volatile` does not stop it: the stores are still
-dead, the fold still happens.
+The pointer has to be a *bare* `struct node far *q` local.  Wrapping it in a
+struct - `struct { struct node far *q; char x[N]; } v` - lets BCC fold it to its
+static offset, emitting `mov es,[bp-n]` plus a direct `es:g_3850+n`; the two
+stores become dead.  A bare pointer local is reloaded with `les` and addressed
+`es:[bx+n]`, which is the target - and `volatile` on the struct member does not
+help, so the shape of the declaration is the lever, not the storage class.
 
-Two smaller lessons came out of the same attempt.  `sub sp, 0xa` for a single
-four-byte local is reproduced by wrapping the pointer in an anonymous struct with
-six spare bytes - the aggregate forces the frame, and the spare member costs
-nothing because it is never touched.  And `!--g.b` versus `!g.b--` selects
-between `add al, 0xff` / `mov [x], al` and `dec byte ptr [x]`: the post-decrement
-form loads the old value before touching memory, which is what the target does.
+The frame size then falls out of the other locals, and declaration order fixes
+the slots.  `int i, t;` lands at [bp-2], `char x[4]` at [bp-6..-3] and `q` at
+[bp-0xa..-7], giving `sub sp,0xa`; no spare-member struct is needed to force it.
 
-The unresolved part is the first branch.  `&&` compiles to one `je` that skips
-both the gate and the body, where the target has `jne` into the gate plus a `jmp`
-past it - same semantics, different block placement.  What makes this function
-unfinished rather than merely imperfect is its shape: it runs `0xF61E` to
-`0xF6B6`, but the code stops at `0xF666` and the shared epilogue sits at
-`0xF6B4`, leaving `0xF667..0xF6B3` unreferenced and containing no instructions at
-all.  Borland does not emit dead byte ranges, so the boundary is probably wrong
-and chasing 152 bytes may be chasing a Ghidra artefact.
+The countdown gate is the *assignment* form `if ((t = g_3853--) != 0) return;`,
+not the bare `if (g_3853-- != 0) return;`:
+
+    target:                            bare form:
+    mov al, byte ptr [0x3853]          mov al, byte ptr [0x3853]
+    dec  byte ptr [0x3853]             dec byte ptr [0x3853]
+    mov  ah, 0                         or  al, al
+    or   ax, ax
+    jne  L_end                         jne L_end
+
+Only the assignment makes BCC materialise the `unsigned char` result as a 16-bit
+int for the comparison.  `t` is still only compared against zero, so it is dead
+and never gets its own slot.  The countdown here is a plain post-decrement; the
+`add al, 0xff` case in the eighth divergence above is unrelated.
+
+## Dead code after an early `return` is still emitted
+
+The raw Ghidra export ends `FUN_1f44_01de` at the `RETF` at 0xF666 (`NOFLOW`) and
+leaves 0xF667..0xF6B3 as an unclaimed hole; `repairholes.py` fills it because the
+`@FUNC` extent runs to 0xF6B6.  Those 77 bytes are neither data nor a boundary
+artefact - they are a second, unreachable copy of the palette-slide / DAC-upload
+half, sharing the live half's frame (loop index at [bp-2], the three RGB bytes at
+[bp-6..-4]).  BCC 3.1 emits it because the source has statements *after* the taken
+path's `return`:
+
+    q = &g_3850;
+    q->b = q->a;
+    pal_shift(q->w4, q->w6, g_3550);
+    return;                      /* inline leave/retf at 0xF665..F666 */
+    ... unreachable loop + upload ...   /* 0xF667..F6B3, falls into 0xF6B4 */
+
+The taken path returns inline while the two guards jump to the shared epilogue at
+0xF6B4; the dead half then runs straight into that same epilogue.  Because the
+early `return` is what splits the two, the opening branch is `jne L_then / jmp
+L_end`, not the single `je` that a `&&` guard produces: the source needs
+`if (p[2] == 0) return;` as its own statement, separate from the countdown guard.
+With the dead half written out the function is exact 50/50 and 152/152 bytes and
+is linked from `src/f44d.c`.

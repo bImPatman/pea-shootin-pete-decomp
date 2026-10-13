@@ -17,19 +17,24 @@ hand.
 
 <!-- progress report start -->
 
-Progress: (43 / 454) attepted, exact match (37 / 454)
-[█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 8.41% exact match
+Progress: (56 / 454) attepted, exact match (51 / 454)
+[███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 11.59% exact match
 | Metric | Count |
 |---|---|
 | Target functions | 454 |
-| Verified shape | 34 |
-| Verified exact | 37 |
-| Attempted | 43 |
+| Verified shape | 47 |
+| Verified exact | 51 |
+| Attempted | 56 |
 
 | Target | Exact % | Source | Bytes |
 |---|---|---|---|
+| `FUN_1fba_0002` | `100.0` | `src/fba0002.asm` | 132/132 |
+| `FUN_1f44_0006` | `100.0` | `src/m_f4406.c` | 125/125 |
+| `FUN_1e25_000a` | `100.0` | `src/m_e2500a.c` | 290/290 |
 | `FUN_13b2_000f` | `25.4` | `src/main.c` | 300/300 |
-| `FUN_1fa6_006a` | `14.3` | `src/dacwrite.c` | 21/23 |
+| `FUN_1fa6_002f` | `100.0` | `src/pal002f.asm` | 59/59 |
+| `FUN_1fa6_006a` | `100.0` | `src/pal006a.asm` | 21/21 |
+| `FUN_1fa6_007f` | `100.0` | `src/pal007f.asm` | 96/96 |
 | `FUN_1f44_00f1` | `100.0` | `src/clrbit3.c` | 13/13 |
 | `FUN_1f44_00fe` | `100.0` | `src/stsave.c` | 69/69 |
 | `FUN_1d19_0104` | `100.0` | `src/dblbox.c` | 70/70 |
@@ -38,13 +43,18 @@ Progress: (43 / 454) attepted, exact match (37 / 454)
 | `FUN_1fd3_0150` | `100.0` | `src/xsetcrtc.c` | 40/40 |
 | `FUN_18a2_0154` | `100.0` | `src/clipxy.c` | 189/189 |
 | `FUN_1f44_01c3` | `100.0` | `src/dacupd.c` | 27/27 |
-| `FUN_1f44_01de` | `18.5` | `src/f44d.c` | 152/71 |
+| `FUN_1f44_01de` | `100.0` | `src/f44d.c` | 152/152 |
 | `FUN_13b2_0252` | `100.0` | `src/m0252.c` | 103/103 |
 | `FUN_1e25_0256` | `100.0` | `src/e256.c` | 334/334 |
+| `FUN_1f44_0276` | `100.0` | `src/f440276.c` | 40/40 |
 | `FUN_1f44_029e` | `100.0` | `src/f44b.c` | 107/107 |
 | `FUN_13b2_02b9` | `100.0` | `src/m02b9.c` | 39/39 |
 | `FUN_1d19_02fe` | `100.0` | `src/setflds.c` | 49/49 |
+| `FUN_1f44_0319` | `100.0` | `src/f440319.c` | 67/67 |
 | `FUN_1d19_032f` | `100.0` | `src/setclass.c` | 58/58 |
+| `FUN_1b11_034c` | `100.0` | `src/mb1134c.c` | 278/278 |
+| `FUN_1f44_0426` | `100.0` | `src/f440426.c` | 71/71 |
+| `FUN_1f44_04a2` | `100.0` | `src/f4404a2.c` | 17/17 |
 | `FUN_1f44_04c4` | `100.0` | `src/settag.c` | 34/34 |
 | `FUN_18a2_0620` | `100.0` | `src/bumpcur.c` | 26/26 |
 | `FUN_1000_07f2` | `100.0` | `src/setgpos.c` | 17/17 |
@@ -58,6 +68,7 @@ Progress: (43 / 454) attepted, exact match (37 / 454)
 | `FUN_18a2_0f9a` | `100.0` | `src/clippos.c` | 89/89 |
 | `FUN_1000_10c1` | `100.0` | `src/farstreq.c` | 45/45 |
 | `FUN_13b2_154f` | `100.0` | `src/m154f.c` | 619/619 |
+| `FUN_1b11_1566` | `100.0` | `src/mb1566.c` | 49/49 |
 | `FUN_1b11_1597` | `100.0` | `src/mb159.c` | 63/63 |
 | `FUN_13b2_17ba` | `100.0` | `src/m17ba.c` | 467/467 |
 | `FUN_1000_18e4` | `100.0` | `src/keyread.c` | 25/25 |
@@ -71,6 +82,8 @@ Progress: (43 / 454) attepted, exact match (37 / 454)
 | `FUN_13b2_2c80` | `100.0` | `src/m2c80.c` | 791/791 |
 | `FUN_13b2_3153` | `100.0` | `src/m3153.c` | 100/100 |
 | `FUN_13b2_34e5` | `7.2` | `src/m34e5.c` | 248/244 |
+| `FUN_13b2_35dd` | `100.0` | `src/m35dd.c` | 709/709 |
+| `FUN_13b2_38a2` | `75.6` | `src/m38a2.c` | 1030/1030 |
 <!-- progress report end -->
 
 ## How it works

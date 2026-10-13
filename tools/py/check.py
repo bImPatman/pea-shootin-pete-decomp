@@ -2,7 +2,7 @@
 
     python tools/py/check.py show  0x10179          # target disassembly
     python tools/py/check.py diff  0x10179 src/foo.c # build + compare
-    python tools/py/check.py all                     # every src/*.c
+    python tools/py/check.py all                     # every src/*.c and *.asm
     python tools/py/check.py list                    # progress table
 
 A source file declares which target function it implements with a marker
@@ -345,7 +345,8 @@ def cmd_diff(db, key, srcpath, verbose=True):
 
 
 def cmd_all(db):
-    files = sorted(glob.glob(os.path.join(SRC, "**", "*.c"), recursive=True))
+    files = sorted(glob.glob(os.path.join(SRC, "**", "*.c"), recursive=True) +
+                   glob.glob(os.path.join(SRC, "**", "*.asm"), recursive=True))
     st = load_status()
     hr('BATCH RUN  (%d source files)' % len(files))
     print('  %-24s %-22s %-7s %-7s %s' % ('source', 'target', 'shape', 'exact', 'note'))

@@ -100,9 +100,11 @@ unsigned char g_27f5, g_27f8;
 unsigned char g_2801, g_2802;
 
 /* +0x1690 / +0x18F8: m_1df6 clears one, sets the other; m_2c80 branches on g_18f8
-   and spins on g_18fa. */
+   and spins on g_18fa.  FUN_13b2_1e25_000a (m_e2500a) stores a word here, while
+   m_2c80 / m_24e7 / m_0dd6 declare it `char` and read only the low byte, so the
+   storage is one word and every reader still sees the status flag. */
 unsigned char g_1690, g_18f8;
-unsigned char g_18fa;
+unsigned int g_18fa;
 
 /* +0x2C60: mode flag compared against 0 and 1 by m_1df6 / m_2c80 / m_24e7. */
 unsigned char g_2c60;
@@ -110,8 +112,9 @@ unsigned char g_2c60;
 /* +0x2C2F/+0x2C31: far pointer returned by FUN_1b11_15d6 in m_1df6. */
 char far *g_2c2f;
 
-/* +0x2BFB / +0x2BFD: words copied from the object behind g_2c2f (m_1df6). */
-unsigned int g_2bfb, g_2bfd;
+/* +0x2BFB / +0x2BFD: words copied from the object behind g_2c2f (m_1df6).
+   Signed so m_38a2's `x < g_2bf7 + g_2bfb` compares emit jg, not ja. */
+int g_2bfb, g_2bfd;
 
 /* +0x34A1/+0x34A3: an object created by FUN_1b11_1dc1 in m_24e7 / m_2c80, holding
    the virtual-call tables those functions dispatch through. */
@@ -339,4 +342,14 @@ unsigned long    g_num_cur;      /* +0x2BFF: value being shown this frame */
 unsigned long    g_num_prev;     /* +0x2C03: last value actually drawn */
 unsigned char    g_27e8;         /* +0x27E8: redraw-countdown tick */
 unsigned char    g_27e9;         /* +0x27E9: redraw latch */
+
+/* m_38a2 (FUN_13b2_38a2) title/menu-screen state.  g_2bf7/g_2bf9 are the rect
+   origin its double loop fills from, g_2bfb/g_2bfd the rect size (declared
+   above), g_2808 the destination byte buffer, g_3888 one of the two gates that
+   ends the menu loop, and g_19ea the word handed to FUN_1fd3_0123. */
+int           g_2bf7;            /* +0x2BF7: rect origin x (set to 0x3d) */
+int           g_2bf9;            /* +0x2BF9: rect origin y (set to 0x42) */
+unsigned char g_3888;            /* +0x3888: menu "confirm" gate */
+int           g_19ea;            /* +0x19EA: FUN_1fd3_0123 source selector */
+unsigned char g_2808[0x800];     /* +0x2808: menu screen byte buffer */
 

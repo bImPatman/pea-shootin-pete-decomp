@@ -10,12 +10,11 @@
  *    breaks main's own bytes.  They run as genuine no-ops and cannot log; the
  *    banner below names them instead.
  *
- *  - The eight *cross-module* callees live in their own files precisely so they
- *    can be replaced wholesale.  This file is that replacement for a run build,
- *    but only for the one that is still missing outright: m_f44d.  Its stand-in
- *    reports itself once and returns a harmless zero, so the game keeps going
- *    instead of stopping at the first gap.  The rest are linked from their own
- *    reconstructions.
+ *  - The cross-module callees live in their own files so each can be replaced
+ *    wholesale.  All of main()'s far callees are now linked from their own
+ *    reconstructions except m_f44b, whose stand-in is in f44bstub.c next door.
+ *    This file is kept for the shared reporting helpers (stub_boot / emit /
+ *    note) that f44bstub.c calls, plus the run-time storage below.
  *
  *  - m_f44b's stand-in is *not* here, but in f44bstub.c next door.  That one is
  *    a genuine reconstruction (src/f44b.c) held back only because it writes VGA
@@ -93,13 +92,13 @@ void stub_boot(void)
        --with-partial too, and that build swaps in the exact m_f44b, so its real
        list is one longer and it prints no m_f44b gap line -- that difference is
        the whole way to tell the two builds apart from the log alone. */
-    emit("[stub] main() has 18 callees; 16 are reconstructed and linked");
+    emit("[stub] main() has 18 direct callees; 17 are reconstructed and linked");
     emit("[stub]   real: key_poll key_read statebak clrbit3 m_1a40");
     emit("[stub]         m_b159 m_f44c m_e256 node_free buf_to_vga");
     emit("[stub]   real in src/mcallees.c:");
-    emit("[stub]     m_1df6 m_24e7 m_013b m_2c80 m_0dd6 m_b11a m_154f");
-    emit("[stub]   inert no-ops in src/mcallees.c, not yet reconstructed:");
-    emit("[stub]     m_38a2 m_2415 m_34e5 m_35dd");
+    emit("[stub]     m_1df6 m_24e7 m_013b m_2c80 m_0dd6 m_b11a m_154f m_2415 m_34e5 m_38a2");
+    emit("[stub]     m_35dd m_f44d");
+    emit("[stub]   not reconstructed: m_f44b (stand-in)");
     emit("[stub] next gap reached will be reported below");
 }
 
@@ -112,13 +111,7 @@ void note(char *name, char *target)
     emit(line);
 }
 
-int m_f44d(char far *p)
-{
-    static int logged;
-    stub_boot();
-    if (!logged) { logged = 1; note("m_f44d", "FUN_1f44_01de"); }
-    return 0;
-}
+/* m_f44d is now the exact src/f44d.c, so no stand-in is needed for it. */
 
 /* m_f44b's stand-in lives in f44bstub.c, because --with-partial replaces it with
    the exact src/f44b.c and two definitions of _m_f44b make Turbo Link run away. */

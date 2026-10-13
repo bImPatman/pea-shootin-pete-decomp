@@ -68,7 +68,15 @@ def trailing_epilogue(f, allf, img):
 
 def orphan_holes(f, allf):
     """Bytes inside f's extent that f never decoded and no other function owns."""
-    ranges = [(o.start, o.start + o.size) for o in allf if o is not f]
+    # Only the bytes another function actually decoded can belong to it.  Using
+    # each neighbour's [start, end) extent instead lets one function's stretched
+    # extent (Ghidra sometimes merges far-apart blocks) veto a hole that is
+    # really ours, and two such neighbours can then block each other forever.
+    ranges = []
+    for o in allf:
+        if o is f:
+            continue
+        ranges.extend(covered_spans(o))
     holes = []
     prev_end = f.start
     for a, b in covered_spans(f):

@@ -68,7 +68,10 @@ def norm_operand(op, mnem, insn, img_size):
         return Tok('reg', low)
 
     # far pointer  seg:offset   (capstone: "0x1234:0x5678" or "es:0x1234")
-    if ':' in o:
+    # A segment-prefixed memory operand ("word ptr cs:[bx+disp]") also contains
+    # ':' but its displacement is an address and must be masked, so leave it to
+    # the bracket handling below.
+    if ':' in o and '[' not in o:
         a, b = o.split(':', 1)
         if _num(a) is not None and _num(b) is not None:
             return Tok('far', 'far:?')

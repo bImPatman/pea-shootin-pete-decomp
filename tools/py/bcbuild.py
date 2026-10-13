@@ -93,6 +93,17 @@ def apply_overrides(cfg, tokens):
     return cfg
 
 
+def tasm_flags(cfg):
+    """TASM invocation for a hand-written .ASM module.
+
+    The source spells out its own SEGMENT directives, so no .MODEL is in play;
+    there is nothing model-dependent to pass beyond enabling the large-model
+    defaults, which the primitives never rely on.  Kept as a function so a
+    primitive that does need a switch has one obvious place to add it.
+    """
+    return ""
+
+
 def startup_obj(model):
     """C0x.OBJ matching the memory model (C0S/C0M/C0L/C0H/C0C)."""
     return {"-ms": "C0S", "-mm": "C0M", "-ml": "C0L", "-mh": "C0H", "-mc": "C0C"}.get(model, "C0L")
@@ -169,6 +180,16 @@ def build(sources, name="prog", cfg=None, exe_dir=None, want_asm=True,
     for src in sources:
         base = os.path.splitext(os.path.basename(src))[0]
         dosbox.stage(src)
+        if src.lower().endswith('.asm'):
+            # Hand-assembled primitive the compiler cannot reproduce (the BCC
+            # 3.1 we have emits push si/pop si around any body that touches si).
+            # TASM produces the .OBJ directly; there is no -S listing to scrape.
+            tflags = tasm_flags(cfg)
+            bat.append('tasm %s%s.ASM >> ..\\OUT\\LOG.TXT' %
+                       (tflags + ' ' if tflags else '', base.upper()))
+            bat.append('if not exist %s.OBJ goto failed' % base.upper())
+            objs.append(base.upper() + '.OBJ')
+            continue
         flags = bcc_flags(cfg, want_asm=False)
         bat.append('bcc %s -c %s.C >> ..\\OUT\\LOG.TXT' %
                    (flags, base.upper()))
@@ -207,7 +228,9 @@ def build(sources, name="prog", cfg=None, exe_dir=None, want_asm=True,
     # TLINK still writes the .EXE when a symbol is undefined, so the batch's
     # `if not exist ...EXE` probe succeeds and BUILD_OK is printed even though
     # the link was bad.  A BCC/TLINK "Error:"/"Fatal:" line is the real signal.
-    failed = re.search(r'(?m)^\s*(?:Error|Fatal)\b', log) is not None
+    # TASM prints "Error messages: None" on a clean assembly, so the lookahead
+    # keeps that summary line from being mistaken for a compiler error.
+    failed = re.search(r'(?im)^\s*(?:Error|Fatal)\b(?!\s+messages)', log) is not None
     res = {"rc": rc, "log": log, "ok": ('BUILD_OK' in log) and not failed,
            "name": name, "flags": bcc_flags(cfg), "model": cfg["model"]}
     _guard_runaway(res)

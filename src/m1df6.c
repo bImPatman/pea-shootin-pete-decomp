@@ -6,7 +6,7 @@
 
 extern unsigned char g_2c60, g_2804, g_2807, g_2c61, g_1690, g_18f8;
 extern char far *g_27aa, *g_34a9, *g_34ad, *g_2c2f, *g_3858, *g_27ae;
-extern unsigned int g_2bfb, g_2bfd;
+extern int g_2bfb, g_2bfd;
 
 void FUN_1000_0ef8(void);
 int FUN_1000_2c09_2(char far *a, char far *b);
