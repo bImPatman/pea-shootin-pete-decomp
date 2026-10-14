@@ -69,7 +69,10 @@ CORE = [
     os.path.join(SRC, 'clrbit3.c'),
     os.path.join(SRC, 'mb159.c'),
     os.path.join(SRC, 'dacupd.c'),
-    os.path.join(SRC, 'dacwrite.c'),  # restored stub
+    os.path.join(SRC, 'dacwrite.c'),  # stub
+    os.path.join(SRC, 'nodefree.c'),
+    os.path.join(SRC, 'nodefree.c'),
+    os.path.join(SRC, 'nodefree.c'),
     os.path.join(SRC, 'nodefree.c'),
     os.path.join(SRC, 'xmod', 'xd19dc.c'),
     os.path.join(SRC, 'e256.c'),
@@ -84,9 +87,9 @@ CORE = [
     # are now byte-exact hand-asm -- pal002f.asm (FUN_1fa6_002f) and pal006a.asm
     # (FUN_1fa6_006a, linked above, which exports `_upload` too).
     os.path.join(SRC, 'f44d.c'),
-    os.path.join(SRC, 'xmod', 'xshift.c'),  # restored stub
-    os.path.join(SRC, 'xmod', 'xupload.c'),  # restored stub
-    os.path.join(SRC, 'pal002f.asm'),
+    os.path.join(SRC, 'xmod', 'xshift.c'),
+    os.path.join(SRC, 'xmod', 'xupload.c'),
+    # os.path.join(SRC, 'pal002f.asm'),
 
     # Stand-ins for the far callees of the four reconstructed bodies (m_1df6,
     # m_24e7, m_013b, m_2c80).  Each of those source files carries its own
@@ -205,8 +208,8 @@ CORE = [
     # fade, which also carries its two near neighbours FUN_1fa6_00df/0127 so the
     # near `call` rel16 matches).  FUN_1000_1a1f, the int86x-style helper
     # FUN_1f44_0426 loads the DAC with, is still a C stand-in.
-    os.path.join(SRC, 'xmod', 'xfba.c'),  # restored stub
-    os.path.join(SRC, 'pal007f.asm'),
+    os.path.join(SRC, 'xmod', 'xfba.c'),
+    os.path.join(SRC, 'xmod', 'xfa6007f.c'),
     os.path.join(SRC, 'xmod', 'x1a1f.c'),
     # m_e2500a's / m_f4406's far callees (both bodies now live in mcallees.c,
     # replacing x1e2500a.c / x1f4406.c).  FUN_1000_0778 is a bump allocator so
