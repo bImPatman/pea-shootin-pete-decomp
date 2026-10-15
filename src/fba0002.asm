@@ -11,6 +11,23 @@
 ; the compiler cannot emit this; TASM reproduces the hand-written original.
 
     .186
+DGROUP GROUP _DATA
+    assume ds:DGROUP
+
+; Plane-mask lookup tables.  The target addresses these at DS:0x2028/0x202c,
+; but those offsets belong to unrelated globals in this rebuild, so the source
+; references them by symbol and lets the linker place them with the rest of the
+; game's data.  The leading pad keeps the displacement above check.py's
+; SMALL_DISP (0x200) so it stays an unverified address field (masked in tier 2)
+; just as it is in the target.
+_DATA segment word public 'DATA'
+    db 300h dup(0)
+_fba_startmask label byte
+    db 0Fh, 0Eh, 0Ch, 08h
+_fba_endmask label byte
+    db 0Fh, 01h, 03h, 07h
+_DATA ends
+
 FBA0002_TEXT segment byte public 'CODE'
     assume cs:FBA0002_TEXT
 
@@ -36,10 +53,10 @@ _FUN_1fba_0002 proc far
     inc  dx
     mov  si, [bp+6]
     and  si, 3
-    mov  bh, [si+2028h]
+    mov  bh, [si+_fba_startmask]
     mov  si, [bp+0ah]
     and  si, 3
-    mov  bl, [si+202ch]
+    mov  bl, [si+_fba_endmask]
     mov  cx, [bp+0ah]
     mov  si, [bp+6]
     cmp  cx, si

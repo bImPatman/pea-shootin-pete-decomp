@@ -16,6 +16,21 @@
 ; references them.
 
     .186
+DGROUP GROUP _BSS
+    assume ds:DGROUP
+
+; The two 0x300-byte fade buffers.  The target addresses them at DS:0x1a28 (the
+; working palette) and DS:0x1d28 (the fade target), but in this rebuild those
+; offsets land inside unrelated globals (_TBL / g_3550), so the source names
+; them and lets the linker place them with the rest of DGROUP.  The leading pad
+; keeps the displacement above check.py's SMALL_DISP (0x200) so the references
+; stay masked address fields, as they are in the target.
+_BSS segment word public 'BSS'
+    db 300h dup(?)
+_g_fade_work   db 300h dup(?)
+_g_fade_target db 300h dup(?)
+_BSS ends
+
 PAL007F_TEXT segment byte public 'CODE'
     assume cs:PAL007F_TEXT
 
@@ -32,8 +47,8 @@ _FUN_1fa6_007f proc far
     mov  cx, 300h
 pal007f_copy:
     mov  al, [bx]
-    mov  [si+1d28h], al
-    mov  [si+1a28h], ah
+    mov  [si+_g_fade_target], al
+    mov  [si+_g_fade_work], ah
     inc  si
     inc  bx
     loop pal007f_copy
@@ -41,17 +56,17 @@ pal007f_copy:
 pal007f_outer:
     mov  bx, 0
 pal007f_scan:
-    mov  al, [bx+1d28h]
-    mov  dl, [bx+1a28h]
+    mov  al, [bx+_g_fade_target]
+    mov  dl, [bx+_g_fade_work]
     cmp  dl, al
     je   pal007f_next
     sub  al, cl
     cmp  al, 0
     jg   pal007f_store
-    mov  byte ptr [bx+1a28h], 0
+    mov  byte ptr [bx+_g_fade_work], 0
     jmp  pal007f_next
 pal007f_store:
-    mov  [bx+1a28h], al
+    mov  [bx+_g_fade_work], al
 pal007f_next:
     inc  bx
     cmp  bx, 300h
@@ -61,7 +76,7 @@ pal007f_next:
     mov  al, 0
     out  dx, al
     inc  dx
-    mov  si, 1a28h
+    mov  si, offset DGROUP:_g_fade_work
     push cx
     mov  cx, 300h
     cld
@@ -85,7 +100,7 @@ _FUN_1fa6_00df proc far
     mov  cx, 300h
 pal00df_copy:
     mov  al, [bx]
-    mov  [si+1a28h], al
+    mov  [si+_g_fade_work], al
     inc  si
     inc  bx
     loop pal00df_copy
@@ -93,9 +108,9 @@ pal00df_copy:
 pal00df_dec:
     xor  bx, bx
 pal00df_scan:
-    cmp  byte ptr [bx+1a28h], 0
+    cmp  byte ptr [bx+_g_fade_work], 0
     je   pal00df_skip
-    dec  byte ptr [bx+1a28h]
+    dec  byte ptr [bx+_g_fade_work]
 pal00df_skip:
     inc  bx
     cmp  bx, 300h
@@ -105,7 +120,7 @@ pal00df_skip:
     mov  al, 0
     out  dx, al
     inc  dx
-    mov  si, 1a28h
+    mov  si, offset DGROUP:_g_fade_work
     push cx
     mov  cx, 300h
     cld
